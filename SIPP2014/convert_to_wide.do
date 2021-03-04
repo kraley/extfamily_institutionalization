@@ -114,7 +114,7 @@ label values educ educ
 
 local i_vars "SSUID PNUM"
 local j_vars "panelmonth"
-local wide_vars "ERESIDENCEID EPNPAR1 EPNPAR2 EPAR1TYP EPAR2TYP EPNSPOUSE TAGE EMS ERELRP WPFINWGT ERACE ESEX EORIGIN THTOTINC TFTOTINC RHNUMPERWT2 mom_educ biomom_educ dad_educ  mom_age biomom_age dad_age biodad_age residence_members mx_residence_members educ RGED RENROLL EEDGRADE EEDGREP RFOODR RFOODS RHNUMU18 RHNUMU18WT2 RHNUM65OVER RHNUM65OVRT2 RHPOV RHPOVT2 THINCPOV THINCPOVT2 with_original"
+local wide_vars "ERESIDENCEID EPNPAR1 EPNPAR2 EPAR1TYP EPAR2TYP EPNSPOUSE TAGE EMS ERELRP WPFINWGT ERACE ESEX EORIGIN THTOTINC TFTOTINC RHNUMPERWT2 mom_educ biomom_educ dad_educ  mom_age biomom_age dad_age biodad_age residence_members mx_residence_members educ RGED RENROLL EEDGRADE EEDGREP RFOODR RFOODS RHNUMU18 RHNUMU18WT2 RHNUM65OVER RHNUM65OVRT2 RHPOV RHPOVT2 THINCPOV THINCPOVT2 with_original THNETWORTH"
 
 local extra_vars "overall_max_residence_members"
 

@@ -180,12 +180,12 @@ my_racealt my_sex mom_educ* dad_educ* adj_age* mom_age* ///
 biomom_age* biomom_educ* dad_age* biodad_age* innext*  ///
 biomom_ed_first mom_ed_first dad_ed_first par_ed_first mom_measure ///
 check fill TAGE* THTOTINC* TFTOTINC* educ* RGED* RENROLL* EEDGRADE* EEDGREP* RFOODR* RFOODS* ///
-RHNUMU18* RHNUMU18WT2* RHNUM65OVER* RHNUM65OVRT2* RHPOV* RHPOVT2* THINCPOV* THINCPOVT2* RHNUMPERWT2* ERESIDENCEID*
+RHNUMU18* RHNUMU18WT2* RHNUM65OVER* RHNUM65OVRT2* RHPOV* RHPOVT2* THINCPOV* THINCPOVT2* RHNUMPERWT2* ERESIDENCEID* THNETWORTH*
 
 
 save "$SIPP14keep/demo_wide_am.dta", $replace
 
-reshape long adj_age EMS ERELRP WPFINWGT EORIGIN EPAR1TYP EPAR2TYP mom_educ dad_educ mom_age biomom_age biomom_educ dad_age biodad_age innext  TAGE THTOTINC TFTOTINC educ RGED RENROLL EEDGRADE EEDGREP RFOODR RFOODS RHNUMPERWT2 RHNUMU18 RHNUMU18WT2 RHNUM65OVER RHNUM65OVRT2 RHPOV RHPOVT2 THINCPOV THINCPOVT2 ERESIDENCEID, i(SSUID PNUM) j(panelmonth)
+reshape long adj_age EMS ERELRP WPFINWGT EORIGIN EPAR1TYP EPAR2TYP mom_educ dad_educ mom_age biomom_age biomom_educ dad_age biodad_age innext  TAGE THTOTINC TFTOTINC educ RGED RENROLL EEDGRADE EEDGREP RFOODR RFOODS RHNUMPERWT2 RHNUMU18 RHNUMU18WT2 RHNUM65OVER RHNUM65OVRT2 RHPOV RHPOVT2 THINCPOV THINCPOVT2 ERESIDENCEID THNETWORTH, i(SSUID PNUM) j(panelmonth)
 
 label variable adj_age "Adjusted Age"
 label variable innext "Is this person interviewed in next month?"
