@@ -31,8 +31,10 @@ global SIPP14keep "$homedir/projects/extfamily_institutionalization/data/keep/20
 global sipp2014_logs "$homedir/projects/extfamily_institutionalization/logs/2014"
 
 *temporary data files
-
 global tempdir "$homedir/projects/extfamily_institutionalization/data/temp"
+
+*results
+
 
 global replace "replace"
 
