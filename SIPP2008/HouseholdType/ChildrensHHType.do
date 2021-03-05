@@ -107,7 +107,7 @@ if hhmaxage < 14 then chhmaxage==2
 
 merge 1:1 SSUID EPPPNUM panelmonth using "$SIPP08keep/demo_long_interviews_am.dta", ///
 keepusing(WPFINWGT my_racealt adj_age my_sex biomom_ed_first par_ed_first ///
-ref_person_educ mom_measure mom_age mom_tmoveus dad_tmoveus)
+ref_person_educ mom_measure mom_age mom_tmoveus dad_tmoveus pimmigrant)
 
 keep if _merge==3
 
@@ -167,4 +167,4 @@ foreach v in `t2rel'{
 	label values `v' yesno
 }
 
-save "$tempdir/relationships.dta", replace
+save "$SIPP08keep/relationships.dta", replace
