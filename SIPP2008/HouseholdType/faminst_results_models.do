@@ -1,4 +1,9 @@
+* famiinst_results_models.do
+*
+* Produces Table 2, models predicting household splits
+* tests hypotheses 2 through 7.
 
+* here because I think I can reuse this code for 14
 local panel "08"
 
 use "${SIPP`panel'keep}/faminst_analysis.dta", clear
@@ -22,14 +27,11 @@ local hhchange "comp_changey hhsplity"
 * Regression analysis
 
 // setting up multi-variate models
-
+/*
 local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage hhmaxage pimmigrant"
 
 svy: logit hhsplity i.rei `baseline' 
 outreg2 using "$results/InstExtReg`panel'.xls", append ctitle(Model 2) 
-
-// in contrast to the descriptive bivariate analysis above, these models 
-*  have mutually-exclusive household type cateogires
 
 svy: logit hhsplity i.rei `baseline' b0.hhtype
 outreg2 using "$results/InstExtReg`panel'.xls", append ctitle(Model 3)
@@ -40,21 +42,27 @@ forvalues r=1/7{
 	outreg2 using "$results/InstExtReg`panel'.xls", append ctitle(re=`re')
 	margins hhtype, subpop(if rei==`r') saving(file`r', replace)
 }
-
-/*
-// Graphs
-combomarginsplot file1 file2 file3 file4 file5, ylabel(0(.1).8) ysc(r(0 .8)) scheme(s1color) aspectratio(.5) ///
-labels(White Black Hispanic Asian Other) xscale(r(0 1)) xtitle(“Race”)
-combomarginsplot file1 file2, ylabel(0(.1).8) ysc(r(0 .8)) scheme(s1color) aspectratio(.5) ///
-labels(White Black) xscale(r(0 1)) xtitle(“Race”)
-combomarginsplot file1 file3, ylabel(0(.1).8) ysc(r(0 .8)) scheme(s1color) aspectratio(.5) ///
-labels(White Hispanic) xscale(r(0 1)) xtitle(“Race”)
-combomarginsplot file1 file4, ylabel(0(.1).8) ysc(r(0 .8)) scheme(s1color) aspectratio(.5) ///
-labels(White Asian) xscale(r(0 1)) xtitle(“Race”)
-combomarginsplot file1 file5, ylabel(0(.1).8) ysc(r(0 .8)) scheme(s1color) aspectratio(.5) ///
-labels(White Other) xscale(r(0 1)) xtitle(“Race”)
 */
+*******
+* rotate comparison group to grandparent households
 
+local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage hhmaxage pimmigrant"
+
+svy: logit hhsplity i.rei `baseline' 
+outreg2 using "$results/InstExtReg`panel'_rotate.xls", append ctitle(Model 2) 
+
+svy: logit hhsplity i.rei `baseline' b2.hhtype
+outreg2 using "$results/InstExtReg`panel'_rotate.xls", append ctitle(Model 3)
+
+forvalues r=1/7{
+	local re : word `r' of `reidummies'
+	svy, subpop(if rei==`r'):logit hhsplity `baseline' b2.hhtype 
+	outreg2 using "$results/InstExtReg`panel'_rotate.xls", append ctitle(re=`re')
+	margins hhtype, subpop(if rei==`r') saving(file`r', replace)
+}
+***************************
+* finished regression models, now test for interactions
+******************
 log using "${sipp20`panel'_logs}/tests", text replace
 
 // Tests - Models with interactions
@@ -63,14 +71,13 @@ local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsi
 svy: logit hhsplity `baseline' b0.hhtype##rei
 outreg2 using "$results/Interaction`panel'.xls", append ctitle(Model with interactions)
 
-
-* Test 1 
+* Test 2 
 contrast hhtype##rei, effects
 /* Support that some extended ararngemenst are associated with less instability
 for Black ans Hispanic hildren when compared o NH White. Asians are not different. 
 */
 
-* Test 2: grandparent relationships are stronger than other relationships? 
+* Test 3: grandparent relationships are stronger than other relationships? 
 contrast {hhtype 0 1 -1 0 0}, effects // gp vs other relatives, no non-relatives s
 contrast {hhtype 0 1 0 -1 0}, effects // gp vs only non-relatives 
 contrast {hhtype 0 1 0 0 -1}, effects // gp vs relative & non-relatives 

@@ -1,4 +1,8 @@
+* famiinst_results_describe.do
+*
+* Produces Table 1, a description of race-ethnic-immigration variation in household composition
 
+* here because I think I can reuse this code for 14
 local panel "08"
 
 use "${SIPP`panel'keep}/faminst_analysis.dta", clear
@@ -132,12 +136,12 @@ forvalues r=1/7{
 
 * parent immigrant
 
-local row = `row'+1
+local row = `row'+2
 svy: mean pimmigrant
-*matrix mpi=e(b)
-*putexcel `prop_col'`row' = matrix(mpi), nformat(#.##)
-*count if pimmigrant == 1
-*putexcel `samp_col'`row' = `r(N)'
+matrix mpi=e(b)
+putexcel `prop_col'`row' = matrix(mpi), nformat(#.##)
+count if pimmigrant == 1
+putexcel `samp_col'`row' = `r(N)'
 
 * parent education
 forvalues pe=1/5{
@@ -229,4 +233,16 @@ forvalues re=1/7{
 		putexcel `ncol'`row' = `r(N)'
 	}
 }
+
+// Graphs
+combomarginsplot file1 file2 file3 file4 file5, ylabel(0(.1).8) ysc(r(0 .8)) scheme(s1color) aspectratio(.5) ///
+labels(White Black Hispanic Asian Other) xscale(r(0 1)) xtitle(“Race”)
+combomarginsplot file1 file2, ylabel(0(.1).8) ysc(r(0 .8)) scheme(s1color) aspectratio(.5) ///
+labels(White Black) xscale(r(0 1)) xtitle(“Race”)
+combomarginsplot file1 file3, ylabel(0(.1).8) ysc(r(0 .8)) scheme(s1color) aspectratio(.5) ///
+labels(White Hispanic) xscale(r(0 1)) xtitle(“Race”)
+combomarginsplot file1 file4, ylabel(0(.1).8) ysc(r(0 .8)) scheme(s1color) aspectratio(.5) ///
+labels(White Asian) xscale(r(0 1)) xtitle(“Race”)
+combomarginsplot file1 file5, ylabel(0(.1).8) ysc(r(0 .8)) scheme(s1color) aspectratio(.5) ///
+labels(White Other) xscale(r(0 1)) xtitle(“Race”)
 
