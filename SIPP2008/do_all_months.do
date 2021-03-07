@@ -54,34 +54,34 @@ if `r(confirmdir)' {
 ** ATTENTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ** NOTE: Please do not change the directories here. If $sipp2008_code does not point to the correct
 ** directory, change it in your setup file. 
-*do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" extract_and_format
+do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" extract_and_format
 
 ** Combines all the waves into a long file where every person-wave is a record. 
-*do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" merge_all_months  
+do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" merge_all_months  
 
 ** Makes sub-datasets for analyses.
 ** Includes file for maternal and parental characteristics like education and immigration status
-*do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" make_auxiliary_datasets_am 
+do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" make_auxiliary_datasets_am 
 
 ** Generates a wide dataset by person (includes static demographic variables). 
-*do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" convert_to_wide_am 
+do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" convert_to_wide_am 
 
 ** Makes sure ages are consistent in all the waves. Caveat: cleaning incomplete.
 * Also produces demo_wide and demo_long data files
-*do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" normalize_ages_am 
+do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" normalize_ages_am 
 
 ** Computes biderectional base relationships (mom, dad, child, spouse) 
-*do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" compute_base_relationships_am 
+do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" compute_base_relationships_am 
 
 ** Identifies additional relationships transitively
-*do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" compute_secondary_relationships_am 
+do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" compute_secondary_relationships_am 
 
 ** Creates a variable to measure change in household composition.
 ** Also creates lists of people who arrive/leave or stay in ego's household
-*do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" create_comp_change_am 
+do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" create_comp_change_am 
 
 ** Creates addr_change and hh_change. Converts data file to long. Core file: hh_change.dta
-*do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" create_hh_change_am 
+do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" create_hh_change_am 
 
 ** Links ego's household arrivers and stayers (in comp_change) 
 ** to relationships data created by compute_secondary_relationships. 
