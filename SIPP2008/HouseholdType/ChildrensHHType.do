@@ -12,6 +12,8 @@
 
 use "$SIPP08keep/HHComp_asis_am", clear
 
+local panel "08"
+
 rename EPPPNUM relfrom
 rename to_EPPNUM relto
 
@@ -115,6 +117,39 @@ if hhmaxage < 14 then chhmaxage==2
 merge 1:1 SSUID EPPPNUM panelmonth using "$SIPP08keep/demo_long_interviews_am.dta", ///
 keepusing(WPFINWGT my_racealt adj_age my_sex biomom_ed_first par_ed_first ///
 ref_person_educ mom_measure mom_age mom_tmoveus dad_tmoveus)
+
+***************************************************************************
+* Checking sample size before any restrictions. demo_long_interview_am.dta is
+* complete. I have confirmed against the log for merge_all_months
+
+* First, create an id variable per person
+	sort SSUID EPPPNUM
+	egen id = concat (SSUID EPPPNUM)
+	destring id, gen(idnum)
+	format idnum %20.0f
+	drop id
+
+// Create a macro with the total number of respondents in the dataset.
+	egen allobs = nvals(idnum)
+	global allindividuals`panel' = allobs
+	di "${allindividuals`panel'}"
+	
+	global allmonths`panel' = _N
+	di "${allmonths`panel'}"
+
+*******************************************************************************
+* First major sample selection: children only. We can finally do this now 
+* that we have variables describing household composition and household change
+*******************************************************************************
+keep if adj_age < 18
+
+// Create a macro with the total number of respondents in the dataset.
+
+	global allchildren`panel' = allobs
+	di "${allindividuals`panel'}"
+	
+	global allchildmonths`panel' = _N
+	di "${allmonths`panel'}"
 
 keep if _merge==3
 
