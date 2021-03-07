@@ -143,6 +143,12 @@ label val hhtype hhtype
 forvalues t=1/4{
 	gen hhtype_`t' = (hhtype==`t')
 }
+	egen all = nvals(idnum)
+	global allindividuals`panel' = all
+	di "${select_individuals`panel'}"
+	
+	global allmonths`pane' = _N
+	di "${select_months`panel'}"
 
 save "${SIPP`panel'keep}/faminst_analysis.dta", replace
 

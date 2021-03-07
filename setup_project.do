@@ -47,3 +47,18 @@ if (_rc) {
         `"you can do so by clicking this link: {stata "ssc install combomarginsplot":auto-install combomarginsplot}"'
     exit 199
 }
+
+capture : which confirmdir
+if (_rc) {
+    display as error in smcl `"Please install package {it:confirmdir} from SSC in order to run these do-files;"' _newline ///
+        `"you can do so by clicking this link: {stata "ssc install confirmdir":auto-install confirmdir}"'
+    exit 199
+}
+
+capture : which mdesc
+if (_rc) {
+    display as error in smcl `"Please install package {it:mdesc} from SSC in order to run these do-files;"' _newline ///
+        `"you can do so by clicking this link: {stata "ssc install mdesc":auto-install mdesc}"'
+    exit 199
+}
+

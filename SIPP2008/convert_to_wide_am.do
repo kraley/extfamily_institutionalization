@@ -1,12 +1,17 @@
-//==============================================================================
-//===== Children's Household Instability Project                                                    
-//===== Dataset: SIPP2008                                                                              
-//===== Purpose: Create a wide database by person (SSUID EPPPNUM) including variables describing parental characteristics, race and sex. 
-//===== Logic: This file generates variables indicating the first and last wave numbers in which this person is encountered.
-//=====        Also, generates a single value for race and sex even though for some people reports vary across waves.
-//==============================================================================
+//=================================================================================//
+//====== Extended Family Institutionalization Project                          
+//====== Dataset: SIPP2008                                               
+//====== Purpose: Creates sub-databases: shhadid_members.dta, ssuid_members_wide.dta
+//====== ssuid_shhadid_wide.dta, person_pdemo (parents demographics), partner_of_ref_person_long (and wide)
+//=================================================================================//
+
+* This code was originally written for the children's households project. 
+
+* Code is specific to 2008 panel.
+
+local panel "08"
  
-use "$tempdir/allmonths", clear  
+use "${SIPP`panel'keep}/allmonths", clear  
 
 merge m:1 SSUID SHHADID panelmonth using "$tempdir/shhadid_members_am" 
 assert _merge == 3

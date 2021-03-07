@@ -5,6 +5,10 @@
 //====== ssuid_shhadid_wide.dta, person_pdemo (parents demographics), partner_of_ref_person_long (and wide)
 //=================================================================================//
 
+* This code was originally written for the children's households project. 
+
+* Code is specific to 2008 panel.
+local panel "08"
 
 //================================================================================//
 //== Purpose: Make the shhadid member database with a single string variable 
@@ -12,7 +16,7 @@
 //== be used for normalize ages and so it includes a string variable with list of 
 //== all ages of household members with EPPPNUM.
 //================================================================================//
-use "$tempdir/allmonths"
+use "${SIPP`panel'keep}/allmonths"
 
 drop SWAVE SREFMON
 
@@ -81,7 +85,7 @@ save "$tempdir/shhadid_members_am", $replace
 //== describing number of sample unit members across all waves
 //================================================================================//
 
-use "$tempdir/allmonths"
+use "${SIPP`panel'keep}/allmonths"
 
 drop SWAVE SREFMON
 
@@ -144,7 +148,7 @@ save "$tempdir/ssuid_members_wide_am", $replace
 //== in the sampling unit (SSUID) in each wave and overall.
 //================================================================================//
 
-use "$tempdir/allmonths"
+use "${SIPP`panel'keep}/allmonths"
 
 drop SWAVE SREFMON
 
@@ -214,7 +218,7 @@ save "$tempdir/ssuid_shhadid_wide_am", $replace
 //==        and father (EPNDAD) to get parents' educ and immigration status in the analysis dataset.
 //================================================================================//
 
-use "$tempdir/allmonths"
+use "${SIPP`panel'keep}/allmonths"
 
 drop SWAVE SREFMON
 
@@ -243,44 +247,42 @@ drop EEDUCATE EBORNUS
 
 *Years in the US
 *The year the panel was taken:
-g year=2008 if panelmonth>=1 & panelmonth<=4
-forvalues y=1/5{
-replace year=2008+`y' if panelmonth>=(`y'-1)*12+5 & panelmonth<=`y'*12+4 
+gen year=20`panel' if panelmonth>=1 & panelmonth<=4
+	forvalues y=1/5{
+	replace year=20`panel'+`y' if panelmonth>=(`y'-1)*12+5 & panelmonth<=`y'*12+4 
 }		
 
 *year of birth
-g birthyear=year-TAGE
+gen birthyear=year-TAGE
 
 *year of migration
-g yrmigration=2008 if TMOVEUS==22
-replace yrmigration=2007 if TMOVEUS==21
-replace yrmigration=2006 if TMOVEUS==20
-replace yrmigration=2005 if TMOVEUS==19
-replace yrmigration=2004 if TMOVEUS==18
-replace yrmigration=2002.5 if TMOVEUS==17
-replace yrmigration=2001 if TMOVEUS==16
-replace yrmigration=2000 if TMOVEUS==15
-replace yrmigration=1999 if TMOVEUS==14
-replace yrmigration=1997.5 if TMOVEUS==13
-replace yrmigration=1995.5 if TMOVEUS==12
-replace yrmigration=1993.5 if TMOVEUS==11
-replace yrmigration=1991.5 if TMOVEUS==10
-replace yrmigration=1989.5 if TMOVEUS==9
-replace yrmigration=1987 if TMOVEUS==8
-replace yrmigration=1984.5 if TMOVEUS==7
-replace yrmigration=1982 if TMOVEUS==6
-replace yrmigration=1979.5 if TMOVEUS==5
-replace yrmigration=1976 if TMOVEUS==4
-replace yrmigration=1971 if TMOVEUS==3
-replace yrmigration=1965 if TMOVEUS==2
-replace yrmigration=1960 if TMOVEUS==1
+
+* where the category is a range of dates, value is mid-point
+gen yrmigration=2008 if TMOVEUS==22
+replace yrmigration = 2007   if TMOVEUS==21
+replace yrmigration = 2006   if TMOVEUS==20
+replace yrmigration = 2005   if TMOVEUS==19
+replace yrmigration = 2004   if TMOVEUS==18
+replace yrmigration = 2002.5 if TMOVEUS==17
+replace yrmigration = 2001   if TMOVEUS==16
+replace yrmigration = 2000   if TMOVEUS==15
+replace yrmigration = 1999   if TMOVEUS==14
+replace yrmigration = 1997.5 if TMOVEUS==13
+replace yrmigration = 1995.5 if TMOVEUS==12
+replace yrmigration = 1993.5 if TMOVEUS==11
+replace yrmigration = 1991.5 if TMOVEUS==10
+replace yrmigration = 1989.5 if TMOVEUS==9
+replace yrmigration = 1987   if TMOVEUS==8
+replace yrmigration = 1984.5 if TMOVEUS==7
+replace yrmigration = 1982   if TMOVEUS==6
+replace yrmigration = 1979.5 if TMOVEUS==5
+replace yrmigration = 1976   if TMOVEUS==4
+replace yrmigration = 1971   if TMOVEUS==3
+replace yrmigration = 1965   if TMOVEUS==2
+replace yrmigration = 1960   if TMOVEUS==1
 
 *age at immigration
-g age_migration=yrmigration-birthyear
-
-
-
-
+gen age_migration=yrmigration-birthyear
 
 * demo_epppnum will be key to merge with epnmom and epndad to get parent education onto
 * ego's record
@@ -289,9 +291,8 @@ rename TAGE page /* page for "parent age" */
 rename age_migration ptmoveus /* pmoveus for "parent's age at immigration" */
 rename TBRSTATE ptbrstate /*pbpl for "parent birthplace"*/
 
-
 save "$tempdir/person_pdemo_am", $replace
 
 * create a dataset of household reference persons.
-do "$base_code/SIPP2008/make_aux_refperson_am"
+do "$base_code/SIPP20`panel'/make_aux_refperson_am"
 

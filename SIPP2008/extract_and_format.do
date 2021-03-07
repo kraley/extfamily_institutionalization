@@ -1,9 +1,12 @@
-* This file extracts the needed data from the NBER core data files and formats 
-* them for this project, which originally used a data file extracted directly 
-* from Census using data ferrett (with capitalized variable names, for example)
+//==============================================================================//
+//===== Extended Family Institutionalization Project
+//===== Dataset: SIPP2008
+//===== Purpose: 
 
+* This file extracts the needed data from NBER core data files and formats 
+* them for this project.
 
-/* We first create an extract from the wave 2 topical module that will be merge 
+/* We first create an extract from the wave 2 topical module that will be merged 
 later to the other waves. This TM contains information on migration for all the
 individuals in the household ages 15 or older. 
 */

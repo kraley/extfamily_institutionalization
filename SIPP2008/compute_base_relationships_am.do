@@ -1,8 +1,14 @@
-//========================================================================================================//
-//===== Children's Household Instability Project                                     
-//===== Dataset: SIPP2008                                                            
-//===== Purpose: Compute relationships of ego to other household members using EPNMOM, EPNDAD, EPNSPOUSE and ERRP 
-//========================================================================================================//
+//=================================================================================//
+//====== Extended Family Institutionalization Project                          
+//====== Dataset: SIPP2008                                               
+//====== Purpose: Creates sub-databases: shhadid_members.dta, ssuid_members_wide.dta
+//====== ssuid_shhadid_wide.dta, person_pdemo (parents demographics), partner_of_ref_person_long (and wide)
+//=================================================================================//
+
+* This code was originally written for the children's households project. 
+
+* Code is specific to 2008 panel.
+local panel "08"
 
 ********************************************************************************
 * Section: Start by creating programs to process data
@@ -67,9 +73,9 @@ end
 
 ********************************************************************************
 * Read in and label data
-use "$tempdir/allmonths"
+use "${SIPP`panel'keep}/allmonths", clear  
 
-do "$sipp2008_code/relationship_label"
+do "${sipp20`panel'_code}/relationship_label"
 ********************************************************************************
 
 * A small number of cases identified themselves as their own mother, father, or spouse

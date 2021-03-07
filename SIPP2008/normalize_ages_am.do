@@ -1,8 +1,15 @@
-//========================================================================================================================//
-//=================== Children's Household Instability Project                    ========================================//
-//=================== Dataset: SIPP2008                                           ========================================//
-//=================== Purpose: This file fixes up age so the months are consistent ========================================//
-//========================================================================================================================//
+//=================================================================================//
+//====== Extended Family Institutionalization Project                          
+//====== Dataset: SIPP2008                                               
+//====== Purpose: Creates sub-databases: shhadid_members.dta, ssuid_members_wide.dta
+//====== ssuid_shhadid_wide.dta, person_pdemo (parents demographics), partner_of_ref_person_long (and wide)
+//=================================================================================//
+
+* This code was originally written for the children's households project. 
+
+* Code is specific to 2008 panel.
+local panel "08"
+
 use "$tempdir/person_wide_am"
 
 gen num_ages = 0
@@ -192,7 +199,7 @@ forvalues month=1/59{
 }
 gen dropoutnw61=.
 
-save "$SIPP08keep/demo_wide_am.dta", $replace
+save "${SIPP`panel'keep}/demo_wide_am.dta", $replace
 
 reshape long adj_age EMS ERRP WPFINWGT EORIGIN EBORNUS ETYPMOM ETYPDAD mom_educ dad_educ mom_age biomom_age biomom_educ dad_age biodad_age innext ref_person ref_person_sex ref_person_educ TAGE THTOTINC TFTOTINC ref_person_tmoveus ref_person_tbrstate mom_tmoveus dad_tmoveus mom_tbrstate dad_tbrstate educ dropout dropoutnw everdropout EHHNUMPP, i(SSUID EPPPNUM) j(panelmonth)
 
@@ -207,8 +214,8 @@ tab adj_age fill
 tab ERRP,m 
 
 * most important for linking to arrivers who have missing data 
-save "$SIPP08keep/demo_long_all_am", $replace
+save "${SIPP`panel'keep}/demo_long_all_am", $replace
 
 drop if missing(ERRP)
 
-save "$SIPP08keep/demo_long_interviews_am", $replace
+save "${SIPP`panel'keep}/demo_long_interviews_am", $replace

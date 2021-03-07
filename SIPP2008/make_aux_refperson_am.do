@@ -1,5 +1,17 @@
+//=================================================================================//
+//====== Extended Family Institutionalization Project                          
+//====== Dataset: SIPP2008                                               
+//====== Purpose: Creates sub-databases: shhadid_members.dta, ssuid_members_wide.dta
+//====== ssuid_shhadid_wide.dta, person_pdemo (parents demographics), partner_of_ref_person_long (and wide)
+//=================================================================================//
+
+* This code was originally written for the children's households project. 
+
+* Code is specific to 2008 panel.
+local panel "08"
+
 *** We also need a dataset of reference persons.
-use "$tempdir/allmonths"
+use "${SIPP`panel'keep}/allmonths"
 keep SSUID EPPPNUM SHHADID ERRP ESEX EEDUCATE TMOVEUS TBRSTATE SWAVE
 
 keep if ((ERRP == 1) | (ERRP == 2))
@@ -21,7 +33,6 @@ rename educ ref_person_educ
 rename TMOVEUS ref_person_tmoveus
 rename TBRSTATE ref_person_tbrstate
 
-
 label values ref_person_educ educ
 
 drop EEDUCATE
@@ -30,8 +41,3 @@ bysort SSUID SHHADID SWAVE: keep if _n==1 // keep one observation per address pe
 
 save "$tempdir/ref_person_long_am", $replace
 
-// below is not guaranteed to work right. removing to make sure I fix it if I try to use wide file
-// the issue is that j is SWAVE and not panelmonth
-*reshape wide ref_person ref_person_sex ref_person_educ, i(SSUID SHHADID) j(SWAVE)
-*save "$tempdir/ref_person_wide_am", $replace
-*rm "$tempdir/ref_person_wide_am.dta"

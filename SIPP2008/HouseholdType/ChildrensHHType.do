@@ -1,7 +1,14 @@
+//==============================================================================//
+//===== Extended Family Institutionalization Project
+//===== Dataset: SIPP
+//===== Purpose: creates the household type variable, the main predictor
+
 * This file has one record per coresident other per person per month
 * One needs to collapse by SSUID EPPPNUM panelmonth to get to person-months
 
 * Run do_all_months (or at least project_macros) before executing this file
+
+* Produces relationships.dta with one record per person
 
 use "$SIPP08keep/HHComp_asis_am", clear
 
@@ -161,6 +168,7 @@ foreach v in `anyrel'{
 	label values `v' yesno
 }
 
+* t2 refers to topical module 2
 local t2rel "anyt2gp anyt2au anyt2or anyt2nr"
 
 foreach v in `t2rel'{
