@@ -1,8 +1,15 @@
+//==============================================================================//
+//===== Extended Family Institutionalization Project
+//===== Dataset: SIPP2008
+//===== Purpose: Executes do files to create core datafiles:
+//===== 
+
+* creates relationship_matrix.do and compares transitively-derived measures of 
+* relationships to topical module 2 relationships
+
 use "$SIPP2008tm/sippp08putm2.dta", clear
 
 keep ssuid epppnum shhadid erelat* eprlpn* tage
-
-tab erelat01
 
  *******************************************************
  * rename variables to remove leading 0 for single digits
@@ -23,17 +30,12 @@ gen countother=0
   replace countother=countother+1 if eprlpn`p' > 0 & erelat`p' !=99
   replace countall=countall+1 if eprlpn`p' > 0
  }
- 
- tab countall 
- tab countother
 
 rename epppnum relfrom
 
 reshape long erelat eprlpn, i(ssuid relfrom) j(pn)
 
 rename eprlpn relto
-
-tab erelat
 
 drop if relto < 0
 
@@ -50,7 +52,6 @@ use "$SIPP08keep/relationship_pairs_bymonth"
 keep if panelmonth==5
 
 merge 1:1 SSUID relto relfrom using "$SIPP08keep/relationship_matrix"
-
 
 putexcel set "$results/compare_relationships08.xlsx", sheet(checkrels) modify
 

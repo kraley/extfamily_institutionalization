@@ -9,7 +9,7 @@
 args logdir fname
 
 capture log close
-log using "`logdir'/`fname'", text $replace
+log using "`logdir'/`fname'", text replace
 
 
 * I would love to turn off line wrap so the state is a single

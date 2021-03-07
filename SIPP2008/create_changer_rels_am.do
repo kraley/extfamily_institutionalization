@@ -1,11 +1,12 @@
-//==============================================================================
-//===== Children's Household Instability Project
+//==============================================================================//
+//===== Extended Family Institutionalization Project
 //===== Dataset: SIPP2008
-//===== Purpose:  Link individuals identified as entering, leaving, or staying in
-//===== a person's (ego's) household to their relationship to ego.
-//==============================================================================
+//===== Purpose: Executes do files to create core datafiles:
+//===== 
 
-use "$SIPP08keep/comp_change_am.dta", clear
+local panel "08"
+
+use "${SIPP`panel'keep}/comp_change_am.dta", clear
 
 keep SSUID EPPPNUM SHHADID* arrivers* leavers* stayers* comp_change* comp_change_reason* adj_age* 
 
@@ -149,7 +150,7 @@ label define change_type 1 "arriver" 2 "leaver"
 label values change_type change_type 
 
 * Label relationships. 
-do "$sipp2008_code/simple_rel_label"
+do "${sipp20`panel'_code}/simple_rel_label"
 
 ***********************************************************************
 * Note that we compared our relationships to the relationships identified 
@@ -161,8 +162,6 @@ do "$sipp2008_code/simple_rel_label"
 * In addition, we found that nearly all (85%) the missing relationships (40) were
 * nonrelatives.
 **********************************************************************
-
-
 gen bioparent=1 if relationship==1
 gen parent=1 if inlist(relationship,1,4,7,19,21)
 gen sibling=1 if inlist(relationship,17)

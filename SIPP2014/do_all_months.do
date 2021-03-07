@@ -1,5 +1,5 @@
 //==============================================================================//
-//===== Children's Household Instability Project
+//===== Extended Family Institutionalization Project
 //===== Dataset: SIPP2014
 //===== Purpose: Executes do files to create core datafiles:
 //===== 
@@ -19,7 +19,7 @@ foreach datafile of local datafiles {
         rm `datafile'
 }
 
-cd "$childhh_base_code"
+cd "$base_code"
 
 ***************************************************************************
 ** Section: The following code attempts to make sure these packages are installed before allowing execution.
@@ -75,47 +75,48 @@ if `r(confirmdir)' {
 * Execute scripts to process data.
 ********************************************************************************
 ** Extracts data from NBER download and formats it for our scripts
-do "$childhh_base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" extract_and_format
+do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" extract_and_format
 
 ** Combines all the waves into a long file where every person-wave is a record. 
-do "$childhh_base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" merge_waves  
+do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" merge_waves  
 
 ** Makes sub-datasets for analyses.
 ** Includes file for maternal and parental characteristics like education and immigration status
-do "$childhh_base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" make_auxiliary_datasets 
+do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" make_auxiliary_datasets 
 
 ** Generates a wide dataset by person (includes static demographic variables). 
-do "$childhh_base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" convert_to_wide 
+do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" convert_to_wide 
 
 ** Makes sure ages are consistent in all the waves. Caveat: cleaning incomplete.
 * Also produces demo_wide and demo_long data files
-do "$childhh_base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" normalize_ages 
+do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" normalize_ages 
 
 ** Creates matched demographic info file for all coresident pairs of type 1 people 
-do "$childhh_base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" allpairs
+do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" allpairs
 
 ** Computes biderectional base relationships (mom, dad, child, spouse) 
-do "$childhh_base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" compute_relationships 
+do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" compute_relationships 
 
 ** Creates a variable to measure change in household composition.
 ** Also creates lists of people who arrive/leave or stay in ego's household
-do "$childhh_base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" create_comp_change 
+do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" create_comp_change 
 
 ** Creates addr_change and hh_change. Converts data file to long. Core file: hh_change.dta
-do "$childhh_base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" create_hh_change 
+do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" create_hh_change 
 
 ** Links ego's household arrivers and stayers (in comp_change) 
 ** to relationships data created by compute_relationships. 
-do "$childhh_base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" create_changer_rels 
+do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" create_changer_rels 
 
 ** Merges relationship of changers to ego back to comp_change
-do "$childhh_base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" create_HHchangeWithRelationships 
+do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" create_HHchangeWithRelationships 
 
 ** Creates a pairwise data file with one record per coresident individuals in each wave.
 ** Useful for identifying household composition of children, but to produce results that describe
 ** households of children, need to collapse by SSUID SHHADID and panelmonth and then select if adj_age < 18
-do "$childhh_base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" create_HHComp_asis
+do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" create_HHComp_asis
 
+/*
 ******************************
 * Clean up temporary directory
 ******************************
@@ -127,4 +128,4 @@ foreach datafile of local datafiles {
         rm `datafile'
 }
 
-cd "$childhh_base_code"
+cd "$base_code"

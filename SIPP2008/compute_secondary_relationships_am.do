@@ -1,9 +1,13 @@
-//==============================================================================
-//=========== Children's Household Instability Project                                  
-//=========== Dataset: SIPP2008                                                 
-//=========== Purpose: Uses programs to compute relationships not 
-//=========== directly identifiable with parent pointers, spouse pointer, or ERRP  
-//================================================================================
+//=================================================================================//
+//====== Extended Family Institutionalization Project                          
+//====== Dataset: SIPP2008                                               
+//====== Purpose: Creates sub-databases: shhadid_members.dta, ssuid_members_wide.dta
+//====== ssuid_shhadid_wide.dta, person_pdemo (parents demographics), partner_of_ref_person_long (and wide)
+//=================================================================================//
+
+* This code was originally written for the children's households project. 
+
+* Code is specific to 2008 panel.
 
 ********************************************************************************
 **  Section: programs to process data to identify relationships transitively

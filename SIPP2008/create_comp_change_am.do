@@ -1,12 +1,8 @@
-//==============================================================================
-//===== Children's Household Instability Project
+//==============================================================================//
+//===== Extended Family Institutionalization Project
 //===== Dataset: SIPP2008
-//===== Purpose:  Compute household composition changes.  We compute not just 
-//=====           the fact of a change, but the id's of who changed so that we 
-//=====           can examine relationships for those responsible for the changes.
-//=====           We segregate leavers from arrivers in case this distinction is relevant.
-//=====           We also compute who stays in the household so we can look at the attributes of stayers.
-//==============================================================================
+//===== Purpose: Executes do files to create core datafiles:
+//===== 
 
 use "$tempdir/person_wide_adjusted_ages_am"
 
@@ -377,7 +373,3 @@ forvalues month = $firstmonth/$penultimate_month {
 drop _*
 
 save "$SIPP08keep/comp_change_am.dta", $replace
-
-*** TODO:  Check data.
-* One thing in particular is getting the same person in a set twice.
-* Make sure we never do a bogus comparison against the "" in first month and last month for prev and future, respectively.

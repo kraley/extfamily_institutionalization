@@ -10,10 +10,10 @@ forvalues wave=1/4 {
 	set maxvar 5500
 	use "$SIPP2014/pu2014w`wave'_compressed"
 	keep tftotinc thtotinc tst_intv ems eorigin epnpar1 epnpar2 epnspouse ///
-	erace erelrp esex epar1typ epar1typ epar2typ  tage  rhnumperwt2  ///
+	erace erelrp esex epar1typ epar1typ epar2typ  tage  rhnumperwt2 thnetworth ///
 	rfamrefwt2 thtotinc eresidenceid einttype pnum  ///
 	shhadid monthcode aroutingsrop swave wpfinwgt eeduc ssuid rged ///
-	renroll eedgrade eedgrep rfoodr rfoods rhnumper rhnumperwt2 rhnumu18 rhnumu18wt2 rhnum65over rhnum65ovrt2 rhpov rhpovt2 thincpov thincpovt2 eresidenceid rrel* rrel_pnum*
+	renroll eedgrade eedgrep rfoodr rfoods rhnumper rhnumperwt2 rhnumu18 rhnumu18wt2 rhnum65over rhnum65ovrt2 rhpov rhpovt2 thincpov thincpovt2 eresidenceid rrel* rrel_pnum* tyrentry
 
         drop rrelig // an rrel* variable I didn't intend to grab
 

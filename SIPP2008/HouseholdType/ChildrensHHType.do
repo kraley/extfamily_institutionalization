@@ -1,9 +1,18 @@
+//==============================================================================//
+//===== Extended Family Institutionalization Project
+//===== Dataset: SIPP
+//===== Purpose: creates the household type variable, the main predictor
+
 * This file has one record per coresident other per person per month
 * One needs to collapse by SSUID EPPPNUM panelmonth to get to person-months
 
 * Run do_all_months (or at least project_macros) before executing this file
 
+* Produces relationships.dta with one record per person
+
 use "$SIPP08keep/HHComp_asis_am", clear
+
+local panel "08"
 
 rename EPPPNUM relfrom
 rename to_EPPNUM relto
@@ -109,6 +118,39 @@ merge 1:1 SSUID EPPPNUM panelmonth using "$SIPP08keep/demo_long_interviews_am.dt
 keepusing(WPFINWGT my_racealt adj_age my_sex biomom_ed_first par_ed_first ///
 ref_person_educ mom_measure mom_age mom_tmoveus dad_tmoveus)
 
+***************************************************************************
+* Checking sample size before any restrictions. demo_long_interview_am.dta is
+* complete. I have confirmed against the log for merge_all_months
+
+* First, create an id variable per person
+	sort SSUID EPPPNUM
+	egen id = concat (SSUID EPPPNUM)
+	destring id, gen(idnum)
+	format idnum %20.0f
+	drop id
+
+// Create a macro with the total number of respondents in the dataset.
+	egen allobs = nvals(idnum)
+	global allindividuals`panel' = allobs
+	di "${allindividuals`panel'}"
+	
+	global allmonths`panel' = _N
+	di "${allmonths`panel'}"
+
+*******************************************************************************
+* First major sample selection: children only. We can finally do this now 
+* that we have variables describing household composition and household change
+*******************************************************************************
+keep if adj_age < 18
+
+// Create a macro with the total number of respondents in the dataset.
+
+	global allchildren`panel' = allobs
+	di "${allindividuals`panel'}"
+	
+	global allchildmonths`panel' = _N
+	di "${allmonths`panel'}"
+
 keep if _merge==3
 
 drop _merge
@@ -161,10 +203,11 @@ foreach v in `anyrel'{
 	label values `v' yesno
 }
 
+* t2 refers to topical module 2
 local t2rel "anyt2gp anyt2au anyt2or anyt2nr"
 
 foreach v in `t2rel'{
 	label values `v' yesno
 }
 
-save "$tempdir/relationships.dta", replace
+save "$SIPP08keep/relationships.dta", replace

@@ -8,8 +8,10 @@
 ********************************************************
 *
 
+local panel "08"
+
 // a wide file
-use "$SIPP08keep/comp_change_am.dta", clear
+use "${SIPP`panel'keep}/comp_change_am.dta", clear
 
 gen comp_change0=.
 gen leavers0=" "
@@ -41,9 +43,9 @@ reshape long comp_changey hhsplity obsyear, i(SSUID EPPPNUM) j(year)
 
 replace year=year-1 // lag the dv
 
-save "$tempdir/compchangey08", replace
+save "$tempdir/compchangey`panel'", replace
 
-use  "$tempdir/relationships.dta", replace
+use  "${SIPP`panel'keep}/relationships.dta", replace
 
 keep if inlist(panelmonth, 12, 24, 36, 48)
 
@@ -52,7 +54,7 @@ replace year=2 if panelmonth==24
 replace year=3 if panelmonth==36
 replace year=4 if panelmonth==48 
 
-merge 1:1 SSUID EPPPNUM year using "$tempdir/compchangey08"
+merge 1:1 SSUID EPPPNUM year using "$tempdir/compchangey`panel'"
 
 keep if _merge == 3
 
@@ -74,11 +76,35 @@ replace mom_age=0 if missing(mom_age)
 gen mom_age2=mom_age*mom_age
 
 * dummy indicators for demographics
+
+gen pimmigrant=((mom_tmoveus>17 & mom_tmoveus!=.) | (dad_tmoveus>17 & dad_tmoveus!=.))
+
 gen black= my_racealt==2
 gen nhwhite= my_racealt==1
 gen hispanic= my_racealt==3
 gen asian= my_racealt==4
 gen otherr=my_racealt==5
+
+gen asian_nat=1 if asian==1 & pimmigrant==0 
+replace asian_nat=0 if missing(asian_nat)
+
+gen asian_im=1 if asian==1 & pimmigrant==1
+replace asian_im=0 if missing(asian_im)
+
+gen hispanic_nat=1 if hispanic==1 & pimmigrant==0
+replace hispanic_nat=0 if missing(hispanic_nat)
+
+gen hispanic_im=1 if hispanic==1 & pimmigrant==1
+replace hispanic_im=0 if missing(hispanic_im)
+
+local reidummies "nhwhite black hispanic_nat hispanic_im asian_nat asian_im otherr"
+
+gen rei=.
+
+forvalues rei=1/7{
+	local rei_name : word `rei' of `reidummies'
+	replace rei=`rei' if `rei_name'==1
+}
 
 gen plths=par_ed_first==1
 gen phs=par_ed_first==2
@@ -90,8 +116,6 @@ gen twobio=parentcomp==1
 gen singlebio=parentcomp==2
 gen stepparent=parentcomp==3
 gen noparent=parentcomp==4
-
-gen pimmigrant=((mom_tmoveus>17 & mom_tmoveus!=.) | (dad_tmoveus>17 & dad_tmoveus!=.))
 
 gen nongprel= (anyauntuncle==1 | anyother==1)
 
@@ -119,8 +143,14 @@ label val hhtype hhtype
 forvalues t=1/4{
 	gen hhtype_`t' = (hhtype==`t')
 }
+	egen all = nvals(idnum)
+	global allindividuals`panel' = all
+	di "${select_individuals`panel'}"
+	
+	global allmonths`pane' = _N
+	di "${select_months`panel'}"
 
-save "$SIPP08keep/faminst_analysis.dta", replace
+save "${SIPP`panel'keep}/faminst_analysis.dta", replace
 
 
  

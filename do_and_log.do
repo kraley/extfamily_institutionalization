@@ -15,10 +15,10 @@
 args codedir logdir fname
 
 
-do "$childhh_base_code/childhh_prolog" "`logdir'" "`fname'"
+do "$base_code/prolog" "`logdir'" "`fname'"
 
 
 do "`codedir'/`fname'"
 
 
-do "$childhh_base_code/childhh_epilog" "`logdir'" "`fname'"
+do "$base_code/epilog" "`logdir'" "`fname'"

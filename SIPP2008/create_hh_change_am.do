@@ -1,14 +1,13 @@
-//==============================================================================
-//===== Children's Household Instability Project                                                    
-//===== Dataset: SIPP2008                                                                               
-//===== Purpose: Create a database with comp_change, addr_change, and sociodemographic characteristics
-//===== One record per person per panelmonth.
-//===== create_comp_change generates the variable comp_change. This file adds addr_change
-//===== and reshapes the data to long form.
-//===== Note: this code depends on macros set in project_macros and create_comp_change
-//==============================================================================
+//==============================================================================//
+//===== Extended Family Institutionalization Project
+//===== Dataset: SIPP2008
+//===== Purpose: Executes do files to create core datafiles:
+//===== 
 
-use "$SIPP08keep/comp_change_am.dta", clear
+
+local panel "08"
+
+use "${SIPP`panel'keep}/comp_change_am.dta", clear
 
 #delimit ; 
 label define addr_change          0 "No move"
@@ -126,7 +125,7 @@ keep SSUID EPPPNUM SHHADID* adj_age* comp_change* addr_change* comp_change_reaso
 
 reshape long SHHADID adj_age comp_change addr_change comp_change_reason, i(SSUID EPPPNUM) j(panelmonth)
 
-merge 1:1 SSUID EPPPNUM panelmonth using "$SIPP08keep/demo_long_all_am.dta"
+merge 1:1 SSUID EPPPNUM panelmonth using "${SIPP`panel'keep}/demo_long_all_am.dta"
 
 drop if panelmonth > $finalmonth
 
@@ -160,4 +159,4 @@ replace insample=3 if insample==0 & !missing(hh_change)
 	label var addr_change "Indicator for whether individual moved"
 	label values addr_change addr_change
 
-save "$SIPP08keep/hh_change_am.dta", $replace
+save "${SIPP`panel'keep}/hh_change_am.dta", $replace

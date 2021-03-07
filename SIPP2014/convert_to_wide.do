@@ -61,6 +61,7 @@ drop pdemo_epppnum
 rename educ par1_educ 
 rename page par1_age
 rename psex par1_sex
+rename ptmoveus par1_tmoveus
 
 recode EPNPAR2 (. = .), gen(pdemo_epppnum)
 merge m:1 SSUID pdemo_epppnum panelmonth using "$tempdir/person_pdemo"
@@ -74,6 +75,7 @@ drop pdemo_epppnum
 rename educ par2_educ
 rename page par2_age
 rename psex par2_sex
+rename ptmoveus par2_tmoveus
 
 gen mom_educ=par1_educ if par1_sex==2
 replace mom_educ=par2_educ if par1_sex==1 
@@ -83,6 +85,10 @@ gen mom_age=par1_age if par1_sex==2
 replace mom_age=par2_age if par1_sex==1
 gen dad_age=par1_age if par1_sex==1
 replace dad_age=par2_age if par1_sex==2 
+gen mom_tmoveus=par1_tmoveus if par1_sex==2
+replace mom_tmoveus=par2_tmoveus if par1_sex==1
+gen dad_tmoveus=par1_tmoveus if par1_sex==1
+replace dad_tmoveus=par2_tmoveus if par1_sex==2 
 
 
 gen biomom_age=mom_age if EPAR1TYP==1 & par1_sex==2
@@ -114,7 +120,7 @@ label values educ educ
 
 local i_vars "SSUID PNUM"
 local j_vars "panelmonth"
-local wide_vars "ERESIDENCEID EPNPAR1 EPNPAR2 EPAR1TYP EPAR2TYP EPNSPOUSE TAGE EMS ERELRP WPFINWGT ERACE ESEX EORIGIN THTOTINC TFTOTINC RHNUMPERWT2 mom_educ biomom_educ dad_educ  mom_age biomom_age dad_age biodad_age residence_members mx_residence_members educ RGED RENROLL EEDGRADE EEDGREP RFOODR RFOODS RHNUMU18 RHNUMU18WT2 RHNUM65OVER RHNUM65OVRT2 RHPOV RHPOVT2 THINCPOV THINCPOVT2 with_original"
+local wide_vars "ERESIDENCEID EPNPAR1 EPNPAR2 EPAR1TYP EPAR2TYP EPNSPOUSE TAGE EMS ERELRP WPFINWGT ERACE ESEX EORIGIN THTOTINC TFTOTINC RHNUMPERWT2 mom_educ biomom_educ dad_educ  mom_age biomom_age dad_age dad_tmoveus mom_tmoveus biodad_age residence_members mx_residence_members educ RGED RENROLL EEDGRADE EEDGREP RFOODR RFOODS RHNUMU18 RHNUMU18WT2 RHNUM65OVER RHNUM65OVRT2 RHPOV RHPOVT2 THINCPOV THINCPOVT2 with_original THNETWORTH"
 
 local extra_vars "overall_max_residence_members"
 

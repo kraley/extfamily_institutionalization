@@ -1,16 +1,13 @@
-//====================================================================//
-//===== Children's Household Instability Project                    
-//===== Dataset: SIPP2008                                           
-//===== Purpose: This code merges a file with information on the relationship
-//                 of household members who arrive or leave in the next wave                
-//               to comp_change hh_change and addr_change. And then collapses
-//               to an individual data file with dummy indicators of whether 
-//               ego saw anyone leave, anyone arrive, a parent leave or arrive,
-//               a sibling leave or arrive, anyone else leave or arrive.
-//=====================================================================//
+//==============================================================================//
+//===== Extended Family Institutionalization Project
+//===== Dataset: SIPP2008
+//===== Purpose: Executes do files to create core datafiles:
+//===== 
+
+local panel "08"
 
 * hh_change has one record per person per wave
-use "$SIPP08keep/hh_change_am.dta"
+use "${SIPP`panel'keep}/hh_change_am.dta"
 
 keep SSUID EPPPNUM panelmonth comp_change hh_change addr_change 
 
@@ -60,7 +57,7 @@ parent_arrive parent_leave otheradult30_arrive otheradult30_leave ///
 otheradult_arrive otheradult_leave yadult_arrive yadult_leave otheryadult_arrive ///
 otheryadult_leave adultsib_arrive adultsib_leave otheradult2_arrive otheradult2_leave infant_arrive, by(SSUID EPPPNUM panelmonth)
 
-merge 1:1 SSUID EPPPNUM panelmonth using "$SIPP08keep/hh_change_am.dta"
+merge 1:1 SSUID EPPPNUM panelmonth using "${SIPP`panel'keep}/hh_change_am.dta"
 
 drop _merge
 
@@ -163,6 +160,6 @@ foreach v in `changevars' {
 label values insample insample
 label values mom_measure momeasure
 
-save "$SIPP08keep/HHchangeWithRelationships_am.dta", $replace
+save "${SIPP`panel'keep}/HHchangeWithRelationships_am.dta", $replace
 
 
