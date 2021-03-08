@@ -15,7 +15,7 @@ global second_wave = ${first_wave} + 1
 global penultimate_wave = ${final_wave} - 1
 global second_month=${firstmonth}+1
 global penultimate_month=${finalmonth}-1
-global adult_age 18
+global top_age 15
 
 ** A global macro for the number of transitive closure passes we want to do.
 global max_tc 1

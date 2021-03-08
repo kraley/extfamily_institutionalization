@@ -7,7 +7,12 @@ local panel "08"
 
 use "${SIPP`panel'keep}/faminst_analysis.dta", clear
 
-keep if adj_age < 15
+* Note that top_age is set in project macros. If you want to change
+* the age range, change it there, rather than here. Otherwise 
+* the parts of the code designed to describe sample selection
+* won't work properly
+
+keep if adj_age < $top_age
 
 svyset [pweight=WPFINWGT]
 

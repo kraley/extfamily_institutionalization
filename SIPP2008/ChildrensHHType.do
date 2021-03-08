@@ -35,7 +35,7 @@ drop if _merge==2
 
 drop _merge
 
-keep if adj_age < 18
+keep if adj_age < $top_age
 
 /*
 putexcel set "$results/compare08.xlsx", sheet(HHmembers) replace
@@ -159,7 +159,7 @@ ref_person_educ mom_measure mom_age mom_tmoveus dad_tmoveus)
 * First major sample selection: children only. We can finally do this now 
 * that we have variables describing household composition and household change
 *******************************************************************************
-keep if adj_age < 18
+keep if adj_age < $top_age
 
 // Create a macro with the total number of respondents in the dataset.
 
@@ -171,13 +171,12 @@ keep if adj_age < 18
 	global allchildmonths`panel' = _N
 	di "${allchildmonths`panel'}"
 
-* drop cases living alone
-
-gen livealone
-keep if _merge==3
+* drop cases living alone. the assert will break if top_age > 15
+assert _merge==3
 
 drop _merge
 
+/* add this back in if top_age > 15
     egen coreskid = nvals(idnum)
 	global coreschild`panel' = coreskid
 	di "${coreschild`panel'}"
@@ -185,7 +184,8 @@ drop _merge
 		
 	global coreschildmonths`panel' = _N
 	di "${coreschildmonths`panel'}"
-
+*/
+	
 gen weight=int(WPFINWGT*10000)
 
 * Transitively-derived (augmented by T2)

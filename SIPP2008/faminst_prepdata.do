@@ -68,7 +68,7 @@ keep if inlist(panelmonth, 12, 24, 36, 48)
 	drop decemberkid
 		
 	global decemberchildmonths`panel' = _N
-	di "${decemberchildmonths`panel'}"
+	di "${decemberchildyear`panel'}"
 
 * end sample macros
 	
@@ -83,7 +83,7 @@ replace year=4 if panelmonth==48
 *************************************************
 
 merge 1:1 SSUID EPPPNUM year using "$tempdir/compchangey`panel'"
-keep if adj_age < 18
+keep if adj_age < $top_age
 
 assert _merge == 3
 
@@ -170,12 +170,6 @@ label val hhtype hhtype
 forvalues t=1/4{
 	gen hhtype_`t' = (hhtype==`t')
 }
-	egen all = nvals(idnum)
-	global allindividuals`panel' = all
-	di "${select_individuals`panel'}"
-	
-	global allmonths`pane' = _N
-	di "${select_months`panel'}"
 
 save "${SIPP`panel'keep}/faminst_analysis.dta", replace
 
