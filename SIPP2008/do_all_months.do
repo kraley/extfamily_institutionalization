@@ -52,7 +52,7 @@ if `r(confirmdir)' {
 * Execute scripts to process data.
 ********************************************************************************
 ** ATTENTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-** NOTE: Please do not change the directories here. If $sipp2008_code does not point to the correct
+** Please do not change the directories here. If $sipp2008_code does not point to the correct
 ** directory, change it in your setup file. 
 do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" extract_and_format
 
@@ -95,5 +95,10 @@ do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" create_HHchangeWith
 ** households of children, need to collapse by SSUID SHHADID and SWAVE and then select if adj_age < 18
 do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" create_HHComp_asis_am
 
-do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" relationship_matrix.do
+*do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" relationship_matrix
 
+* create measures of household composition
+do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" ChildrensHHType
+
+* pull everything together into analysis file
+do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" faminst_prepdata
