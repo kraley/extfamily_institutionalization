@@ -2,14 +2,12 @@
 //===== Extended Family Institutionalization Project
 //===== Dataset: SIPP
 //===== Purpose: creates the household type variable, the main predictor
-
-* This file has one record per coresident other per person per month
-* One needs to collapse by SSUID EPPPNUM panelmonth to get to person-months
+* Produces relationships.dta with one record per person
 
 * Run do_all_months (or at least project_macros) before executing this file
 
-* Produces relationships.dta with one record per person
-
+* This file has one record per coresident other per person per month
+* One needs to collapse by SSUID EPPPNUM panelmonth to get to person-months
 use "$SIPP08keep/HHComp_asis_am", clear
 
 local panel "08"
@@ -17,20 +15,29 @@ local panel "08"
 rename EPPPNUM relfrom
 rename to_EPPNUM relto
 
+* relationship matrix is build from wave 2 relationship info. The pair of people
+* indexed by relfrom and relto need to be observed (living together?) in Wave 2
 merge m:1 SSUID relfrom relto using "$SIPP08keep/relationship_matrix", keepusing(erelat)
 
 gen t2rel=1 if _merge==3
 
+*every pair in the relationship matrix should be found in HHComp_asis_am
+assert _merge !=2
+
 drop _merge
 
 merge m:1 SSUID relfrom relto panelmonth using "$SIPP08keep/relationship_pairs_bymonth", keepusing(relationship)
+* I'm not sure how there are a small number of observations in relationship_pairs_bymonth
+* not in HHComp_asis_am (or relationship_matrix). These cases were generated 
+* in compute_X_relationships, but they aren't observed in this panelmonth in the original data. Drop them.
 
-keep if _merge==1 | _merge==3
+drop if _merge==2
 
 drop _merge
 
 keep if adj_age < 18
 
+/*
 putexcel set "$results/compare08.xlsx", sheet(HHmembers) replace
 
 local relationship "BIOCHILD BIOMOM BIODAD STEPCHILD STEPMOM STEPDAD ADOPTCHILD MOM DAD SPOUSE GRANDCHILD GRANDCHILD_P GRANDPARENT GRANDPARENT_P SIBLING PARTNER F_CHILD CHILD F_PARENT PARENT AUNTUNCLE AUNTUNCLE_OR_PARENT GREATGRANDCHILD NEPHEWNIECE CHILD_OR_NEPHEWNIECE SIBLING_OR_COUSIN F_SIB OTHER_REL OTHER_REL_P NOREL DONTKNOW" 
@@ -59,6 +66,7 @@ tab relationship erelat, matcell(checkrels)
 putexcel C3=matrix(checkrels)
 
 fre erelat if missing(relationship) | relationship==40
+*/
 
 * use relationship matrix variable to fill in missing information on relationships derived transitively
 * We didn't make this easy by having the relationship codes for relationship be the inverse of
@@ -105,8 +113,10 @@ local rellist "bioparent parent sibling  child spartner nonrel grandparent auntu
 
 rename relfrom EPPPNUM
 
+*********************************************************************************************************
+* Record shift from coresident others to individuals.
+*********************************************************************************************************
 // convert the file to individuals from coresident others
-
 collapse (count) `rellist' (max) to_age, by (SSUID EPPPNUM panelmonth) fast
 
 rename to_age hhmaxage
@@ -114,9 +124,16 @@ rename to_age hhmaxage
 recode hhmaxage (14/17=1)(18/49=2)(5/64=3)(65/74=4)(75/90=5), gen(chhmaxage)
 if hhmaxage < 14 then chhmaxage==2
 
+* merge basic demographic information onto the file.
 merge 1:1 SSUID EPPPNUM panelmonth using "$SIPP08keep/demo_long_interviews_am.dta", ///
 keepusing(WPFINWGT my_racealt adj_age my_sex biomom_ed_first par_ed_first ///
 ref_person_educ mom_measure mom_age mom_tmoveus dad_tmoveus)
+
+* Most, but not all, of the difference in samples (_merge !=3) is because of the earlier selection
+* of individual-months less than 18 years old.
+
+* Note also that demo_long_interviews_am includes individuals living alone
+* whereas the files describing household composition do not. 
 
 ***************************************************************************
 * Checking sample size before any restrictions. demo_long_interview_am.dta is
@@ -133,6 +150,7 @@ ref_person_educ mom_measure mom_age mom_tmoveus dad_tmoveus)
 	egen allobs = nvals(idnum)
 	global allindividuals`panel' = allobs
 	di "${allindividuals`panel'}"
+	drop allobs
 	
 	global allmonths`panel' = _N
 	di "${allmonths`panel'}"
@@ -145,15 +163,28 @@ keep if adj_age < 18
 
 // Create a macro with the total number of respondents in the dataset.
 
+    egen allobs = nvals(idnum)
 	global allchildren`panel' = allobs
-	di "${allindividuals`panel'}"
-	
+	di "${allchildren`panel'}"
+	drop allobs
+		
 	global allchildmonths`panel' = _N
-	di "${allmonths`panel'}"
+	di "${allchildmonths`panel'}"
 
+* drop cases living alone
+
+gen livealone
 keep if _merge==3
 
 drop _merge
+
+    egen coreskid = nvals(idnum)
+	global coreschild`panel' = coreskid
+	di "${coreschild`panel'}"
+	drop coreskid
+		
+	global coreschildmonths`panel' = _N
+	di "${coreschildmonths`panel'}"
 
 gen weight=int(WPFINWGT*10000)
 

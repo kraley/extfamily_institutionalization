@@ -1,3 +1,9 @@
+//==============================================================================//
+//===== Extended Family Institutionalization Project
+//===== Dataset: SIPP
+//===== Purpose: Merge together files desccribing household composition in December of each year
+*  to predict a composition change over the subsequent year.
+
 * famiinst_prepdata.do
 *
 *  Merge together files desccribing household composition in December of each year
@@ -36,7 +42,6 @@ forvalues y=1/5 {
 	
 }
 
-
 keep SSUID EPPPNUM comp_changey? hhsplity? obsyear?
 
 reshape long comp_changey hhsplity obsyear, i(SSUID EPPPNUM) j(year)
@@ -45,20 +50,42 @@ replace year=year-1 // lag the dv
 
 save "$tempdir/compchangey`panel'", replace
 
+*******************************************************
+* relationships.dta was created by ChildrensHHType
+* and includes one record per child living with someone
+* per panelmonth observed
+*******************************************************
+
 use  "${SIPP`panel'keep}/relationships.dta", replace
 
 keep if inlist(panelmonth, 12, 24, 36, 48)
 
+* sample macros
+
+    egen decemberkid = nvals(idnum)
+	global decemberkid`panel' = decemberkid
+	di "${decemberkid`panel'}"
+	drop decemberkid
+		
+	global decemberchildmonths`panel' = _N
+	di "${decemberchildmonths`panel'}"
+
+* end sample macros
+	
 gen year=1 if panelmonth==12
 replace year=2 if panelmonth==24
 replace year=3 if panelmonth==36
 replace year=4 if panelmonth==48 
 
+*************************************************
+* merge household composition file (relationships.dta)
+* to dependent variable (compchangey).
+*************************************************
+
 merge 1:1 SSUID EPPPNUM year using "$tempdir/compchangey`panel'"
-
-keep if _merge == 3
-
 keep if adj_age < 18
+
+assert _merge == 3
 
 gen parentcomp=1 if bioparent==2
 replace parentcomp=2 if bioparent==1 & parent==1
