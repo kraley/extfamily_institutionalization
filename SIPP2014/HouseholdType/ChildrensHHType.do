@@ -3,6 +3,8 @@
 
 * Run do_all_months (or at least project_macros) before executing this file
 
+local panel "14"
+
 use "$SIPP14keep/HHComp_asis_am", clear
 
 keep if adj_age < 18
@@ -46,7 +48,7 @@ if hhmaxage < 14 then chhmaxage==2
 
 merge 1:1 SSUID PNUM panelmonth using "$SIPP14keep/demo_long_interviews_am.dta", ///
 keepusing(WPFINWGT my_racealt adj_age my_sex biomom_ed_first par_ed_first ///
-mom_measure mom_age mom_tmoveus dad_tmoveus)
+mom_measure mom_age mom_tmoveus dad_tmoveus THNETWORTH)
 
 keep if _merge==3
 
@@ -93,4 +95,4 @@ foreach v in `anyrel'{
 gen pimmigrant=((mom_tmoveus>17 & mom_tmoveus!=.) | (dad_tmoveus>17 & dad_tmoveus!=.))
 
 
-save "$tempdir/relationships14.dta", replace
+save "${SIPP`panel'keep}/relationships.dta", replace

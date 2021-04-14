@@ -2,11 +2,17 @@
 *
 * Produces Table 1, a description of race-ethnic-immigration variation in household composition
 
+* here because I think I can reuse this code for 14
 local panel "14"
 
 use "${SIPP`panel'keep}/faminst_analysis.dta", clear
 
-keep if adj_age < 15
+* Note that top_age is set in project macros. If you want to change
+* the age range, change it there, rather than here. Otherwise 
+* the parts of the code designed to describe sample selection
+* won't work properly
+
+keep if adj_age < $top_age
 
 svyset [pweight=WPFINWGT]
 
@@ -20,6 +26,7 @@ local subheadings "weighted_proportion N"
 local hhtype "hhtype_1 hhtype_2 hhtype_3 hhtype_4"
 local paredummies "plths phs pscol pcolg pedmiss" 
 local parcomp "twobio singlebio stepparent noparent"
+local incomeassets "hhinc THNETWORTH"
 local hhchange "comp_changey hhsplity"
 
 ********************************************************************************
@@ -38,7 +45,7 @@ local lastcol : word `total_cols' of `c(ALPHA)'
 
 local first_data_col = 2 // column A is for the row headings. Start column headings with B.
 
-putexcel set "$results/`filename'", sheet(`sheetname') modify
+putexcel set "$results/`filename'", sheet(`sheetname') replace
 
 putexcel A1:`lastcol'1 = "`tabletitle'", merge border(bottom)
 
@@ -99,8 +106,11 @@ putexcel A26=" 2 bio"
 putexcel A27=" 1 bio, nostep"
 putexcel A28=" stepparent"
 putexcel A29=" no parent"
-putexcel A30="Household Change"
-putexcel A31="Household Split"
+putexcel A30 = "mean income (1,000s)"
+putexcel A31 = "mean wealth (1,000s)"
+putexcel A32="Household Change"
+putexcel A33="Household Split"
+putexcel A35 = "Total"
 
 ********************************************************************************
 * TABLE Filling
@@ -164,16 +174,32 @@ forvalues p=1/4{
     putexcel `samp_col'`row' = `r(N)'
 }
 
+*HOUSEHOLD INCOME and Assets (means)
+forvalues ia=1/2{
+	local row=`ia'+29
+	local var:word `ia' of `incomeassets'
+	svy: mean `var' 
+	matrix mh`ia' = e(b)/1000
+	putexcel `prop_col'`row' = matrix(mh`ia'), nformat(#)
+	count if !missing(`var')
+	putexcel `samp_col'`row' = `r(N)'
+}
+
 *comp change
 forvalues h=1/2{
-	local row=`h'+29
+	local row=`h'+31
 	local var:word `h' of `hhchange'
 	svy: mean `var' 
 	matrix mh`h' = e(b)
 	putexcel `prop_col'`row' = matrix(mh`h'), nformat(#.##)
 	count if `var'==1
-    putexcel `samp_col'`row' = `r(N)'
+	putexcel `samp_col'`row' = `r(N)'
 }
+
+* total sample size
+local row = 35
+count if  !missing(comp_changey)
+putexcel `samp_col'`row' = `r(N)'
 
 * By Race/Ethnicity
 
@@ -221,9 +247,20 @@ forvalues re=1/7{
 		count if `var'==1 & rei==`re'
 		putexcel `ncol'`row' = `r(N)'
 	}
+	*HOUSEHOLD INCOME and Assets (means)
+	forvalues ia=1/2{
+		local row=`ia'+29
+		local var:word `ia' of `incomeassets'
+		svy, subpop(if rei==`re'): mean `var'
+		matrix mh`ia'`re' = e(b)/1000
+		display "the mean `var' is `e(b)'"
+		putexcel `propcol'`row' = matrix(mh`ia'`re'), nformat(#)
+		count if  rei == `re'
+		putexcel `ncol'`row' = `r(N)'
+	}
 	*household change
 	forvalues h=1/2{
-		local row=`h'+29
+		local row=`h'+31
 		local var:word `h' of `hhchange'
 		svy, subpop(if rei==`re'): mean `var'  
 		matrix mh`h'`re' = e(b)
@@ -231,8 +268,13 @@ forvalues re=1/7{
 		count if `var'==1 & rei==`re'
 		putexcel `ncol'`row' = `r(N)'
 	}
+	* total sample size
+	local row = 35
+	count if  rei == `re'
+	putexcel `ncol'`row' = `r(N)'
 }
 
+/*
 // Graphs
 combomarginsplot file1 file2 file3 file4 file5, ylabel(0(.1).8) ysc(r(0 .8)) scheme(s1color) aspectratio(.5) ///
 labels(White Black Hispanic Asian Other) xscale(r(0 1)) xtitle(“Race”)
