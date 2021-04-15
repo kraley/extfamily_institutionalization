@@ -100,5 +100,3 @@ do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" create_HHComp_asis_
 * create measures of household composition
 do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" ChildrensHHType
 
-* pull everything together into analysis file
-do "$base_code/do_and_log" "$sipp2008_code" "$sipp2008_logs" faminst_prepdata

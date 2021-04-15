@@ -12,10 +12,10 @@ global SIPP2008tm "/data/sipp/2008_TM/StataData"
 global sipp2008_code "$base_code/SIPP2008"
 
 * This is where logfiles produced by stata will go
-global sipp2008_logs "$homedir/projects/childhh/logs"
+global sipp2008_logs "$homedir/projects/extfamily_institutionalization/logs"
 
 * This is where data will put data files that are used in the analysis
-global SIPP08keep "$homedir/projects/childhh/data/keep/2008"
+global SIPP08keep "$homedir/projects/extfamily_institutionalization/data/keep/2008"
 
 * 2014 Macros
 * This is the location of the SIPP original data

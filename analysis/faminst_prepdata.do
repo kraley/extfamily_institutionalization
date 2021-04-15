@@ -6,17 +6,23 @@
 *******************************************************
 * bring in comp_change and create annual measure of composition change
 ********************************************************
-*
 
-local panel "14"
 
 // a wide file
-use "${SIPP`panel'keep}/comp_change_am.dta", clear
+use "${SIPP${panel}keep}/comp_change_am.dta", clear
+
+local nl = ${nloops}
+
+
+* the 2008 panel has a different name for the person-number variable
+capture rename EPPPNUM PNUM
 
 gen comp_change0=.
 gen leavers0=" "
 
-forvalues y=1/4 {
+macro list
+
+forvalues y=1/`nl' {
 	gen obsyear`y'=0 // dummy indicator for whether there were  observations in this year
 	forvalues m=0/11 {
 		local pm=((`y'-1)*12)+`m'
@@ -24,7 +30,7 @@ forvalues y=1/4 {
 	}
 }
 
-forvalues y=1/4 {
+forvalues y=1/`nl' {
 	gen comp_changey`y'= 0 if obsyear`y' > 0
 	gen hhsplity`y'=0 if obsyear`y' > 0
 	forvalues m=0/11 {
@@ -35,7 +41,7 @@ forvalues y=1/4 {
 	tab comp_changey`y' hhsplity`y', m
 }
 
-keep SSUID PNUM comp_changey? hhsplity? obsyear?
+keep SSUID PNUM comp_changey* hhsplity* obsyear*
 
 reshape long comp_changey hhsplity obsyear, i(SSUID PNUM) j(year)
 
@@ -43,43 +49,86 @@ tab comp_changey hhsplity, m
 
 replace year=year-1 // lag the dv
 
-save "$tempdir/compchangey`panel'", replace
+save "$tempdir/compchangey${panel}", replace
 
 *******************************************************
-* bring in comp_change and create annual measure of household income
+* create annual measure of household income
 ********************************************************
 
-use "${SIPP`panel'keep}/demo_wide_am.dta"
+use "${SIPP${panel}keep}/demo_wide_am.dta"
 
-forvalues y=1/4 {
-	gen obsyear`y'=0 // dummy indicator for whether there were  observations in this year
+* the 2008 panel has a different name for the person-number variable
+capture rename EPPPNUM PNUM
+
+forvalues y=1/`nl' {
+	* we number of observations by the 12 month of each year
+	local i = `y'*12
+	gen obsyear`i'=0 // dummy indicator for whether there were  observations in this year
 	forvalues m=1/12 {
 		local pm=((`y'-1)*12)+`m'
-		replace obsyear`y'=obsyear`y'+1 if !missing(THTOTINC`pm')
+		replace obsyear`i'=obsyear`i'+1 if !missing(THTOTINC`pm')
 	}
 }
 
-forvalues y=1/4 {
-	gen hhinc`y'= 0 if obsyear`y' > 0
+* Initialize household income at the start of the year and add
+* income from each month so that month 12 has income for the whole year.
+
+forvalues y=1/`nl' {
+	* we are going to take the sum of income in the 12 month of each year
+	local i = `y'*12
+	gen hhinc`i'= 0 if obsyear`i' > 0
 	forvalues m=1/12 {
 		local pm=((`y'-1)*12)+`m'
-		replace hhinc`y'=hhinc`y'+THTOTINC`pm' if !missing(THTOTINC`pm')
+		replace hhinc`i'=hhinc`i'+THTOTINC`pm' if !missing(THTOTINC`pm')
 	}
 }
 
-keep SSUID PNUM hhinc? obsyear?
 
-reshape long hhinc obsyear, i(SSUID PNUM) j(year)
+
+keep SSUID PNUM hhinc* obsyear* adj_age*
+
+reshape long hhinc obsyear adj_age, i(SSUID PNUM) j(pm)
+
+keep if inlist(pm,12,24,36,48)
+
+tab obsyear
+
+drop if obsyear==0
+
+sort pm
+
+by pm: sum hhinc 
+
+gen inv_partyear = 12/obsyear
+
+* inflate those with partial years by portion of year missing
+replace hhinc=hhinc*inv_partyear
+
+by pm: sum hhinc
+
+* for individuals with missing values on some months of income, inflate to 
+
+gen year=pm/12
+
+drop pm
+
+keep if adj_age <= $top_age
 
 sum hhinc
 
-save "$tempdir/hhinc`panel'", replace
+
+
+save "$tempdir/hhinc${panel}", replace
+
 
 **********************************************************
 * Read in main data
 **********************************************************
 
-use  "${SIPP`panel'keep}/relationships.dta", replace
+use  "${SIPP${panel}keep}/relationships.dta", clear
+
+* the 2008 panel has a different name for the person-number variable
+capture rename EPPPNUM PNUM
 
 keep if inlist(panelmonth, 12, 24, 36, 48)
 
@@ -88,13 +137,13 @@ replace year=2 if panelmonth==24
 replace year=3 if panelmonth==36
 replace year=4 if panelmonth==48 
 
-merge 1:1 SSUID PNUM year using "$tempdir/compchangey`panel'"
+merge 1:1 SSUID PNUM year using "$tempdir/compchangey${panel}"
 
 keep if _merge == 3
 
 drop _merge
 
-merge 1:1 SSUID PNUM year using "$tempdir/hhinc`panel'"
+merge 1:1 SSUID PNUM year using "$tempdir/hhinc${panel}"
 
 keep if _merge == 3
 
@@ -190,7 +239,7 @@ forvalues t=1/4{
 }
 
 
-save "${SIPP`panel'keep}/faminst_analysis.dta", replace
+save "${SIPP${panel}keep}/faminst_analysis.dta", replace
 
 
  

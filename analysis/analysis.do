@@ -6,17 +6,22 @@
 
 * Must run setup_project prior to conducting analysis.
 
+cd "${base_code}/analysis"
+
 local panels "08 14"
 
-forvalues p=1/2 {
-	local panel: word `p' of `panels'
+local loops "5 4"
 
-	* Create measures of children's Household Type
-	do ChildrensHHType.do
+forvalues p=1/2 {
+	global panel: word `p' of `panels'
+	global nloops: word `p' of `loops'
+	
+	macro list
+
+	display "starting with the `panel' panel"
 
 	* Prepare other variables for analysis
 	do faminst_prepdata.do
-
 	* create table of descriptive results
 	do faminst_results_describe.do
 

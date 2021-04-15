@@ -3,18 +3,14 @@
 
 * Run do_all_months (or at least project_macros) before executing this file
 
-local panel "14"
-
 use "$SIPP14keep/HHComp_asis_am", clear
 
-keep if adj_age < 18
+keep if adj_age < $top_age
 
 tab relationship
 
-/* Create simplified/aggregated indicators for comparison to Pilkauskas & Cross
+* Create simplified/aggregated indicators for comparison to Pilkauskas & Cross
 
-Note that this code is now correct. 
-*/
 gen bioparent=1 if relationship==3
 gen parent=1 if inlist(relationship,3,5,7)
 gen sibling=1 if inlist(relationship,11,12,13,14,15)
@@ -95,4 +91,4 @@ foreach v in `anyrel'{
 gen pimmigrant=((mom_tmoveus>17 & mom_tmoveus!=.) | (dad_tmoveus>17 & dad_tmoveus!=.))
 
 
-save "${SIPP`panel'keep}/relationships.dta", replace
+save "$SIPP14keep/relationships.dta", replace

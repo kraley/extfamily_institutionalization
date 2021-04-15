@@ -2,10 +2,7 @@
 *
 * Produces Table 1, a description of race-ethnic-immigration variation in household composition
 
-* here because I think I can reuse this code for 14
-local panel "14"
-
-use "${SIPP`panel'keep}/faminst_analysis.dta", clear
+use "${SIPP${panel}keep}/faminst_analysis.dta", clear
 
 * Note that top_age is set in project macros. If you want to change
 * the age range, change it there, rather than here. Otherwise 
@@ -29,11 +26,13 @@ local parcomp "twobio singlebio stepparent noparent"
 local incomeassets "hhinc THNETWORTH"
 local hhchange "comp_changey hhsplity"
 
+replace THNETWORTH=0 if missing(THNETWORTH)
+
 ********************************************************************************
 * TABLE SHELL
 ********************************************************************************
-local filename "InstitutionalizedExtension"
-local sheetname "descriptives`panel'"
+local filename "InstitutionalizedExtension{panel}"
+local sheetname "descriptives${panel}"
 local tabletitle "Descriptive Statistics for analytical sample"
 
 local gap = 1 // if you want a column separating groups, set to 1. If not, set to 0.

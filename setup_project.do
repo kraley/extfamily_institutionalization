@@ -27,6 +27,22 @@ else {
 
 do setup_`c(username)'
 
+*******************************************************************************
+* main project macros
+*******************************************************************************
+
+global first_wave 1
+global final_wave 15
+global firstrefmon 1
+global finalrefmon 4
+global firstmonth 1
+global finalmonth =15*4
+global second_wave = ${first_wave} + 1
+global penultimate_wave = ${final_wave} - 1
+global second_month=${firstmonth}+1
+global penultimate_month=${finalmonth}-1
+global top_age 15
+
 
 ********************************************************************************
 * Check for package dependencies 
@@ -47,18 +63,3 @@ if (_rc) {
         `"you can do so by clicking this link: {stata "ssc install combomarginsplot":auto-install combomarginsplot}"'
     exit 199
 }
-
-capture : which confirmdir
-if (_rc) {
-    display as error in smcl `"Please install package {it:confirmdir} from SSC in order to run these do-files;"' _newline ///
-        `"you can do so by clicking this link: {stata "ssc install confirmdir":auto-install confirmdir}"'
-    exit 199
-}
-
-capture : which mdesc
-if (_rc) {
-    display as error in smcl `"Please install package {it:mdesc} from SSC in order to run these do-files;"' _newline ///
-        `"you can do so by clicking this link: {stata "ssc install mdesc":auto-install mdesc}"'
-    exit 199
-}
-

@@ -1,7 +1,5 @@
 
-local panel "14"
-
-use "${SIPP`panel'keep}/faminst_analysis.dta", clear
+use "${SIPP${panel}keep}/faminst_analysis.dta", clear
 
 keep if adj_age < $top_age
 
@@ -25,31 +23,31 @@ local hhchange "comp_changey hhsplity"
 
 gen adjage_sq = adj_age*adj_age
 
-local baseline "i.year adj_age adjage_sq i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage log_hhinc log_wealth"
+local baseline "i.year adj_age adjage_sq i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage log_hhinc" 
 
 svy: logit hhsplity i.rei `baseline' 
-outreg2 using "$results/InstExtReg`panel'.xls", append ctitle(Model 2) 
+outreg2 using "$results/InstExtReg${panel}.xls", append ctitle(Model 2) 
 
 // in contrast to the descriptive bivariate analysis above, these models 
 *  have mutually-exclusive household type cateogires
 
 svy: logit hhsplity i.rei `baseline' b0.hhtype
-outreg2 using "$results/InstExtReg`panel'.xls", append ctitle(Model 3)
+outreg2 using "$results/InstExtReg${panel}.xls", append ctitle(Model 3)
 
 forvalues r=1/7{
 	local re : word `r' of `reidummies'
 	svy, subpop(if rei==`r'):logit hhsplity `baseline' b0.hhtype 
-	outreg2 using "$results/InstExtReg`panel'.xls", append ctitle(re=`re')
+	outreg2 using "$results/InstExtReg${panel}.xls", append ctitle(re=`re')
 	margins hhtype, subpop(if rei==`r') saving(file`r', replace)
 }
 
-log using "${sipp20`panel'_logs}/tests", text replace
+log using "${sipp20${panel}_logs}/tests", text replace
 
 // Tests - Models with interactions
 
 local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage hhmaxage i.pimmigrant"
 svy: logit hhsplity `baseline' b0.hhtype##rei
-outreg2 using "$results/Interaction`panel'.xls", append ctitle(Model with interactions)
+outreg2 using "$results/Interaction${panel}.xls", append ctitle(Model with interactions)
 
 
 * Test 1 

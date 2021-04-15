@@ -35,7 +35,7 @@ drop if _merge==2
 
 drop _merge
 
-keep if adj_age < $top_age
+keep if adj_age <= $top_age
 
 /*
 putexcel set "$results/compare08.xlsx", sheet(HHmembers) replace
@@ -128,6 +128,9 @@ if hhmaxage < 14 then chhmaxage==2
 merge 1:1 SSUID EPPPNUM panelmonth using "$SIPP08keep/demo_long_interviews_am.dta", ///
 keepusing(WPFINWGT my_racealt adj_age my_sex biomom_ed_first par_ed_first ///
 ref_person_educ mom_measure mom_age mom_tmoveus dad_tmoveus)
+
+*to make code work for moth 2008 panel and 2014 panel
+gen THNETWORTH=.
 
 * Most, but not all, of the difference in samples (_merge !=3) is because of the earlier selection
 * of individual-months less than 18 years old.
@@ -240,5 +243,7 @@ local t2rel "anyt2gp anyt2au anyt2or anyt2nr"
 foreach v in `t2rel'{
 	label values `v' yesno
 }
+
+gen pimmigrant=((mom_tmoveus>17 & mom_tmoveus!=.) | (dad_tmoveus>17 & dad_tmoveus!=.))
 
 save "$SIPP08keep/relationships.dta", replace
