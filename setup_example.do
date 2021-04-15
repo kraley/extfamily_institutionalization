@@ -27,6 +27,9 @@ global sipp2014_code "$base_code/SIPP2014"
 *This is the location of the SIPP Extracts and analysis files
 global SIPP14keep "$homedir/projects/extfamily_institutionalization/data/keep/2014"
 
+* Pooled data from multiple panels
+global SIPPpoolkeep "$homedir/projects/extfamily_institutionalization/data/keep/pooled"
+
 * This is where logfiles produced by stata will go
 global sipp2014_logs "$homedir/projects/extfamily_institutionalization/logs/2014"
 
@@ -34,6 +37,8 @@ global sipp2014_logs "$homedir/projects/extfamily_institutionalization/logs/2014
 global tempdir "$homedir/projects/extfamily_institutionalization/data/temp"
 
 *results
+global results "$homedir/projects/extfamily_institutionalization/results"
+
 
 
 global replace "replace"

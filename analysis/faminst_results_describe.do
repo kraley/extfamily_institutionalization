@@ -31,7 +31,7 @@ replace THNETWORTH=0 if missing(THNETWORTH)
 ********************************************************************************
 * TABLE SHELL
 ********************************************************************************
-local filename "InstitutionalizedExtension{panel}"
+local filename "InstitutionalizedExtension${panel}"
 local sheetname "descriptives${panel}"
 local tabletitle "Descriptive Statistics for analytical sample"
 
@@ -80,36 +80,37 @@ forvalues group=1/`groups' {
 
 * row headings
 putexcel A4="Household Extension"
-putexcel A5=" only grandparent"
-putexcel A6=" any other relative, no nonrel"
-putexcel A7=" only non-relative"
-putexcel A8=" relatives and non-relatives"
-putexcel A9="Race/Ethnicity"
-putexcel A10=" Non-Hispanice White"
-putexcel A11=" Black"
-putexcel A12=" Non-Black Hispanic US-Born"
-putexcel A13 = " Non--Black Hispanic Immigrant"
-putexcel A14=" Asian, US Born"
-putexcel A15=" Asian, Immigrant"
-putexcel A16=" Other, including multi-racial"
-putexcel A17="Parent Immigrant"
-putexcel A18=" Yes"
-putexcel A19="Parental Education"
-putexcel A20=" less than High School"
-putexcel A21=" diploma or GED"
-putexcel A22=" some college"
-putexcel A23=" College Grad"
-putexcel A24=" unknown"
-putexcel A25="Parent"
-putexcel A26=" 2 bio"
-putexcel A27=" 1 bio, nostep"
-putexcel A28=" stepparent"
-putexcel A29=" no parent"
-putexcel A30 = "mean income (1,000s)"
-putexcel A31 = "mean wealth (1,000s)"
-putexcel A32="Household Change"
-putexcel A33="Household Split"
-putexcel A35 = "Total"
+putexcel A5="none (nuclear)"
+putexcel A6=" only grandparent"
+putexcel A7=" any other relative, no nonrel"
+putexcel A8=" only non-relative"
+putexcel A9=" relatives and non-relatives"
+putexcel A10="Race/Ethnicity"
+putexcel A11=" Non-Hispanice White"
+putexcel A12=" Black"
+putexcel A13=" Non-Black Hispanic US-Born"
+putexcel A14 = " Non--Black Hispanic Immigrant"
+putexcel A15=" Asian, US Born"
+putexcel A16=" Asian, Immigrant"
+putexcel A17=" Other, including multi-racial"
+putexcel A18="Parent Immigrant"
+putexcel A19=" Yes"
+putexcel A20="Parental Education"
+putexcel A21=" less than High School"
+putexcel A22=" diploma or GED"
+putexcel A23=" some college"
+putexcel A24=" College Grad"
+putexcel A25=" unknown"
+putexcel A26="Parent"
+putexcel A27=" 2 bio"
+putexcel A28=" 1 bio, nostep"
+putexcel A29=" stepparent"
+putexcel A30=" no parent"
+putexcel A31 = "mean income (1,000s)"
+putexcel A32 = "mean wealth (1,000s)"
+putexcel A33="Household Change"
+putexcel A34="Household Split"
+putexcel A36 = "Total"
 
 ********************************************************************************
 * TABLE Filling
@@ -123,7 +124,7 @@ local samp_col : word `nsamp_col' of `c(ALPHA)'
 
 * relatives
 forvalues d=1/4{
-	local row=`d'+4
+	local row=`d'+5
 	svy: mean hhtype_`d' 
 	matrix mr`d' = e(b)
 	putexcel `prop_col'`row' = matrix(mr`d'), nformat(#.##)
@@ -133,7 +134,7 @@ forvalues d=1/4{
 
 * race-ethnicity
 forvalues r=1/7{
-	local row=`r'+9
+	local row=`r'+10
 	local var : word `r' of `reidummies'
 	svy: mean `var' 
 	matrix mre`r' = e(b)
@@ -153,7 +154,7 @@ putexcel `samp_col'`row' = `r(N)'
 
 * parent education
 forvalues pe=1/5{
-	local row=`pe'+19
+	local row=`pe'+20
 	local var:word `pe' of `paredummies'
 	svy: mean `var' 
 	matrix mpe`pe' = e(b)
@@ -164,18 +165,18 @@ forvalues pe=1/5{
 
 *parent composition	
 forvalues p=1/4{
-	local row=`p'+25
+	local row=`p'+26
 	local var:word `p' of `parcomp'
 	svy: mean `var' 
 	matrix mp`p' = e(b)
 	putexcel `prop_col'`row' = matrix(mp`p'), nformat(#.##)
 	count if `var'==1
-    putexcel `samp_col'`row' = `r(N)'
+        putexcel `samp_col'`row' = `r(N)'
 }
 
 *HOUSEHOLD INCOME and Assets (means)
 forvalues ia=1/2{
-	local row=`ia'+29
+	local row=`ia'+30
 	local var:word `ia' of `incomeassets'
 	svy: mean `var' 
 	matrix mh`ia' = e(b)/1000
@@ -186,7 +187,7 @@ forvalues ia=1/2{
 
 *comp change
 forvalues h=1/2{
-	local row=`h'+31
+	local row=`h'+32
 	local var:word `h' of `hhchange'
 	svy: mean `var' 
 	matrix mh`h' = e(b)
@@ -196,7 +197,7 @@ forvalues h=1/2{
 }
 
 * total sample size
-local row = 35
+local row = 36
 count if  !missing(comp_changey)
 putexcel `samp_col'`row' = `r(N)'
 
@@ -210,7 +211,7 @@ forvalues re=1/7{
     display "relatives"
 	* relatives
 	forvalues ht=1/4{
-		local row=`ht'+4
+		local row=`ht'+5
 		local var : word `ht' of `hhtype'
 		svy, subpop(if rei==`re'): mean `var' 
 		matrix mr`ht'`re' = e(b)
@@ -221,13 +222,13 @@ forvalues re=1/7{
 	
 	svy, subpop(if rei==`re'): mean pimmigrant
 	matrix mpi`re'=e(b)
-	putexcel `propcol'18 = matrix(mpi`re'), nformat(#.##)
+	putexcel `propcol'19 = matrix(mpi`re'), nformat(#.##)
 	count if pimmigrant == 1 & rei==`re'
-	putexcel `ncol'18 = `r(N)'
+	putexcel `ncol'19 = `r(N)'
 	display "parent education"
 	* parent education
 	forvalues pe=1/5{
-		local row=`pe'+19
+		local row=`pe'+20
 		local var:word `pe' of `paredummies'
 		svy, subpop(if rei==`re'): mean `var' 
 		matrix mpe`pe'`re' = e(b)
@@ -238,7 +239,7 @@ forvalues re=1/7{
 	display "parent composition"
 	*parent composition	
 	forvalues p=1/4{
-		local row=`p'+25
+		local row=`p'+26
 		local var:word `p' of `parcomp'
 		svy, subpop(if rei==`re'): mean `var' 
 		matrix mp`p'`re' = e(b)
@@ -248,7 +249,7 @@ forvalues re=1/7{
 	}
 	*HOUSEHOLD INCOME and Assets (means)
 	forvalues ia=1/2{
-		local row=`ia'+29
+		local row=`ia'+30
 		local var:word `ia' of `incomeassets'
 		svy, subpop(if rei==`re'): mean `var'
 		matrix mh`ia'`re' = e(b)/1000
@@ -259,7 +260,7 @@ forvalues re=1/7{
 	}
 	*household change
 	forvalues h=1/2{
-		local row=`h'+31
+		local row=`h'+32
 		local var:word `h' of `hhchange'
 		svy, subpop(if rei==`re'): mean `var'  
 		matrix mh`h'`re' = e(b)
@@ -268,7 +269,7 @@ forvalues re=1/7{
 		putexcel `ncol'`row' = `r(N)'
 	}
 	* total sample size
-	local row = 35
+	local row = 36
 	count if  rei == `re'
 	putexcel `ncol'`row' = `r(N)'
 }
