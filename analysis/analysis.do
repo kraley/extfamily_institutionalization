@@ -8,6 +8,9 @@
 
 cd "${base_code}/analysis"
 
+* This section is going to prepare the files and analyze the data for each 
+* panel separately
+
 local panels "08 14"
 
 local loops "5 4"
@@ -28,3 +31,22 @@ forvalues p=1/2 {
 	* create table of model results
 	do faminst_results_models.do
 }
+
+* This section pools the data files for the two panels and analyzes them together
+
+use "$SIPP08keep/faminst_analysis.dta", clear
+
+gen panel=1
+
+append using "$SIPP14keep/faminst_analysis.dta"
+
+replace panel=2 if missing(panel)
+
+replace year=year+5 if panel==2
+
+save "$SIPPpoolkeep/faminst_analysis.dta", replace
+
+global panel "pool"
+
+do faminst_results_describe.do
+do faminst_results_models.do
