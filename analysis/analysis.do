@@ -42,7 +42,7 @@ append using "$SIPP14keep/faminst_analysis.dta"
 
 replace panel=2 if missing(panel)
 
-replace year=year+5 if panel==2
+replace year=year+4 if panel==2
 
 save "$SIPPpoolkeep/faminst_analysis.dta", replace
 

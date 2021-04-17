@@ -45,7 +45,7 @@ log using "${sipp20${panel}_logs}/tests", text replace
 
 // Tests - Models with interactions
 
-local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage hhmaxage i.pimmigrant"
+local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage hhmaxage"
 svy: logit hhsplity `baseline' b0.hhtype##rei
 outreg2 using "$results/Interaction${panel}.xls", append ctitle(Model with interactions)
 

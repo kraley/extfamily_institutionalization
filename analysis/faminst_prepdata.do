@@ -202,6 +202,14 @@ replace hispanic_nat=0 if missing(hispanic_nat)
 gen hispanic_im=1 if hispanic==1 & pimmigrant==1
 replace hispanic_im=0 if missing(hispanic_im)
 
+local redummies "nhwhite black hispanic asian otherr"
+
+gen re=.
+forvalues re=1/5{
+	local re_name : word `re' of `redummies'
+	replace re=`re' if `re_name'==1
+}
+
 local reidummies "nhwhite black hispanic_nat hispanic_im asian_nat asian_im otherr"
 
 gen rei=.
