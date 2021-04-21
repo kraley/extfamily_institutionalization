@@ -127,7 +127,7 @@ if hhmaxage < 14 then chhmaxage==2
 * merge basic demographic information onto the file.
 merge 1:1 SSUID EPPPNUM panelmonth using "$SIPP08keep/demo_long_interviews_am.dta", ///
 keepusing(WPFINWGT my_racealt adj_age my_sex biomom_ed_first par_ed_first ///
-ref_person_educ mom_measure mom_age mom_tmoveus dad_tmoveus)
+ref_person_educ mom_measure mom_age mom_tmoveus dad_tmoveus THTOTINC)
 
 *to make code work for moth 2008 panel and 2014 panel
 gen THNETWORTH=.
