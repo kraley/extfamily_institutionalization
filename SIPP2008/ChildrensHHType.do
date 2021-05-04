@@ -121,7 +121,7 @@ collapse (count) `rellist' (max) to_age, by (SSUID EPPPNUM panelmonth) fast
 
 rename to_age hhmaxage
 
-recode hhmaxage (14/17=1)(18/49=2)(5/64=3)(65/74=4)(75/90=5), gen(chhmaxage)
+recode hhmaxage (14/17=1)(18/49=2)(50/64=3)(65/74=4)(75/90=5), gen(chhmaxage)
 if hhmaxage < 14 then chhmaxage==2
 
 * merge basic demographic information onto the file.

@@ -39,7 +39,7 @@ collapse (count) `rellist' (max) to_age, by (SSUID PNUM panelmonth) fast
 
 rename to_age hhmaxage
 
-recode hhmaxage (14/17=1)(18/49=2)(5/64=3)(65/74=4)(75/90=5), gen(chhmaxage)
+recode hhmaxage (14/17=1)(18/49=2)(50/64=3)(65/74=4)(75/90=5), gen(chhmaxage)
 if hhmaxage < 14 then chhmaxage==2
 
 merge 1:1 SSUID PNUM panelmonth using "$SIPP14keep/demo_long_interviews_am.dta", ///
