@@ -164,6 +164,7 @@ replace parentcomp=3 if parent > bioparent
 replace parentcomp=4 if parent==0
 
 label define parentcomp 1 "two bio parent" 2 "single bioparent" 3 "stepparent" 4 "noparent"
+label values parentcomp parentcomp
 
 * mean-center mom_age
 mean mom_age
@@ -184,6 +185,9 @@ gen phs=par_ed_first==2
 gen pscol=par_ed_first==3
 gen pcolg=par_ed_first==4
 gen pedmiss= missing(par_ed_first)
+
+label define educ 1 "Less than High School" 2 "High School Diploma" 3 "Some College" 4 "College Grad+" 5 "Missing"
+label values par_ed_first educ
 
 gen twobio=parentcomp==1
 gen singlebio=parentcomp==2
@@ -239,15 +243,28 @@ gen anyext= (anygp+anyauntuncle+anyother+anynonrel > 0)
 recode hhexttype (0=0)(1=1)(2/3=2)(4=3)(5/7=4), gen(hhtype)
 
 label define hhtype 0 "nuclear" 1 "only grandparent" 2 "other relatives, no non-relatives" 3 "only nonrelatives" 4 "relative and non-relatives"
-label var hhtype hhtype
-label val hhtype hhtype
+label values hhtype hhtype
+label values hhtype hhtype
+
+label define rei 1 "nhwhite" 2 "black" 3 "hispanic_nat" 4 "hispanic_im" 5 "asian_nat" 6 "asian_im" 7 "otherr"
+label define re 1 "White" 2 "Black" 3 "Hispanic" 4 "Asian" 5 "Otherr"
+
+label values rei rei
+label values re re
+
+label define year 1 "2008" 2 "2009" 3 "2010" 4 "2011" 5 "2013" 6 "2014" 7 "2015" 8 "2016"
+label values year year
+
+label define hhmaxage 1 "14-17" 2 "18-49" 3 "50-64" 4 "65-74"  5 "75-90" 
+label values chhmaxage hhmaxage
 
 forvalues t=1/4{
 	gen hhtype_`t' = (hhtype==`t')
 }
 
+keep if pimmigrant==0
+
+tab re
 
 save "${SIPP${panel}keep}/faminst_analysis.dta", replace
 
-
- 
