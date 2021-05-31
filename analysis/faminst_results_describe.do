@@ -15,6 +15,19 @@ use "${SIPP${panel}keep}/faminst_analysis.dta", clear
 
 keep if adj_age < $top_age
 
+* Select only one child per household
+tempfile holding
+save `holding'
+
+keep SSUID PNUM
+duplicates drop
+
+set seed 2222
+bys SSUID: sample 1, count 
+
+merge 1:m SSUID PNUM using `holding', assert(match using) keep(match) nogenerate 
+
+
 keep if pimmigrant == 0
 
 svyset [pweight=WPFINWGT]
