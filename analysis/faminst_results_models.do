@@ -3,6 +3,18 @@ use "${SIPP${panel}keep}/faminst_analysis.dta", clear
 
 keep if adj_age < $top_age
 
+* Select only one child per household
+tempfile holding
+save `holding'
+
+keep SSUID PNUM
+duplicates drop
+
+set seed 2222
+bys SSUID: sample 1, count 
+
+merge 1:m SSUID PNUM using `holding', assert(match using) keep(match) nogenerate 
+
 svyset [pweight=WPFINWGT]
 
 drop if missing(comp_changey)
@@ -34,12 +46,31 @@ outreg2 using "$results/InstExtReg${panel}.xls", append ctitle(Model 2)
 svy: logit hhsplity i.rei `baseline' b0.hhtype
 outreg2 using "$results/InstExtReg${panel}.xls", append ctitle(Model 3)
 
-forvalues r=1/7{
+* the code was breaking in the next lines - to prevent this I am recoding the variable rei
+* and listing rei from 1/5
+replace rei= 4 if rei==5
+replace rei= 5 if rei==7
+lab def rei 1 "nhwhite" 2 "black" 3 "hispanic_nat" 4 "asian_nat" 5 "otherr", replace 
+
+forvalues r=1/5{
 	local re : word `r' of `reidummies'
 	svy, subpop(if rei==`r'):logit hhsplity `baseline' b0.hhtype 
 	outreg2 using "$results/InstExtReg${panel}.xls", append ctitle(re=`re')
 	margins hhtype, subpop(if rei==`r') saving(file`r', replace)
+	marginsplot, recast(bar) plotopts(barw(.8)) xtitle(HH Type - `r') legend( order(0 "Nuclear" 1 "Granparents" 2 "Relatives" 3 "Non-relatives" 4 "Relatives & non-Relatives"))
 }
+
+* Models controling for wealth 
+
+local baselineII "i.year adj_age adjage_sq i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage log_hhinc log_wealth"
+forvalues r=1/5{
+	local re : word `r' of `reidummies'
+	svy, subpop(if rei==`r'):logit hhsplity `baselineII' b0.hhtype 
+	outreg2 using "$results/InstExtReg${panel}.xls", append ctitle(re=`re')
+	margins hhtype, subpop(if rei==`r') saving(file`r', replace)
+	marginsplot, recast(bar) plotopts(barw(.8)) xtitle(HH Typ - `r') legend( order(0 "Nuclear" 1 "Granparents" 2 "Relatives" 3 "Non-relatives" 4 "Relatives & non-Relatives"))
+}
+							
 
 log using "${sipp20${panel}_logs}/tests", text replace
 
