@@ -10,9 +10,6 @@
 *       Also creates a word document describing sample before and after
 *       attrition for, if you like, insertion into paper. 
 
-local panel "08"
-
-
 putdocx begin
 	putdocx paragraph
 	putdocx text ("The 20`panel' of the SIPP includes ${allindividuals`panel'} ")
@@ -31,7 +28,7 @@ preserve
 	* sample macros
 
     egen analysiskid = nvals(idnum)
-	global analysiskid`panel' = analysiskid
+	global analysiskid`panel' = analysiskid 
 	global attritedkid`panel' = ${decemberkid`panel'} - ${analysiskid`panel'}
 	di "${analysiskid`panel'}"
 	drop analysiskid

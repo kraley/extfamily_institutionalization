@@ -26,10 +26,10 @@ forvalues p=1/2 {
 	* Prepare other variables for analysis
 	do faminst_prepdata.do
 	* create table of descriptive results
-	do faminst_results_describe.do
+*	do faminst_results_describe.do
 
 	* create table of model results
-	do faminst_results_models.do
+*	do faminst_results_models.do
 }
 
 * This section pools the data files for the two panels and analyzes them together
@@ -48,5 +48,8 @@ save "$SIPPpoolkeep/faminst_analysis.dta", replace
 
 global panel "pool"
 
+do faminst_attrition.do
 do faminst_results_describe.do
+do faminst_describe_detailed.do
 do faminst_results_models.do
+do faminst_models_dhhtype.do

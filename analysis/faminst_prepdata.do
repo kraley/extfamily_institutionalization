@@ -244,7 +244,15 @@ recode hhexttype (0=0)(1=1)(2/3=2)(4=3)(5/7=4), gen(hhtype)
 
 label define hhtype 0 "nuclear" 1 "only grandparent" 2 "other relatives, no non-relatives" 3 "only nonrelatives" 4 "relative and non-relatives"
 label values hhtype hhtype
-label values hhtype hhtype
+
+
+* a second more detailed measure of hh type
+gen dhhtype=hhtype
+replace dhhtype=dhhtype+1 if dhhtype > 1
+replace dhhtype=2 if auntuncle >= 1 
+
+label define dhhtype 0 "nuclear" 1 "only grandparent" 2 "aunt/uncle" 3 "other relatives, no non-relatives" 4 "only nonrelatives" 5 "relative and non-relatives"
+label values dhhtype dhhtype
 
 label define rei 1 "nhwhite" 2 "black" 3 "hispanic_nat" 4 "hispanic_im" 5 "asian_nat" 6 "asian_im" 7 "otherr"
 label define re 1 "White" 2 "Black" 3 "Hispanic" 4 "Asian" 5 "Otherr"
@@ -260,6 +268,11 @@ label values chhmaxage hhmaxage
 
 forvalues t=1/4{
 	gen hhtype_`t' = (hhtype==`t')
+}
+
+
+forvalues t=1/5{
+	gen dhhtype_`t' = (dhhtype==`t')
 }
 
 keep if pimmigrant==0
