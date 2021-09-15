@@ -79,43 +79,59 @@ log using "${sipp20${panel}_logs}/tests", text replace
 // Tests - Models with interactions
 
 local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage hhmaxage"
-svy: logit hhsplity `baseline' b0.hhtype##rei
+svy: logit hhsplity `baseline' b0.dhhtype##rei
 outreg2 using "$results/Interaction${panel}.xls", append ctitle(Model with interactions)
 
-/*
+
 * Test 1 
+// https://stats.idre.ucla.edu/stata/faq/everything-you-always-wanted-to-know-about-contrasts-but-were-afraid-to-ask/
 contrast dhhtype##rei, effects
-/* Support that some extended ararngemenst are associated with less instability
-for Black ans Hispanic hildren when compared o NH White. Asians are not different. 
+/* Support that some extended arrangemenst (grandparents, aunt/uncle, other relative, non-relative
+are associated with less instability for Black ans Hispanic hildren when compared o NH White. Asians are not different.
 */
 
 * Test 2: grandparent relationships are stronger than other relationships? 
-contrast {hhtype 0 1 -1 0 0}, effects // gp vs other relatives, no non-relatives s
-contrast {hhtype 0 1 0 -1 0}, effects // gp vs only non-relatives 
-contrast {hhtype 0 1 0 0 -1}, effects // gp vs relative & non-relatives 
-/* supports that gp relationships are stronger than other extented arrangements
+contrast {dhhtype 0 1 -1 0 0 0}, effects // gp vs aunt/uncle, 
+contrast {dhhtype 0 1 0 -1 0 0}, effects // gp vs other relatives, no non-relatives s
+contrast {dhhtype 0 1 0 0 -1 0}, effects // gp vs only non-relatives 
+contrast {dhhtype 0 1 0 0 0 -1}, effects // gp vs relative & non-relatives 
+/* supports that GP relationships are STRONGER than other extented arrangements including AUNT/UNCLE
 */
 
-* Test 3: boundary between grandparents and non-kin is especially strong among Asian and Hispanic children’s 
-contrast {hhtype 0 1 -1 0 0}#g.rei, effects
-contrast {hhtype 0 1 0 -1 0}#g.rei, effects
-contrast {hhtype 0 1 0 0 -1}#g.rei, effects
+* Test 3: boundary between grandparents and other kin is especially strong among Asian and Hispanic children’s 
+/* OBS: I am having a little bit of troube understanding what we wanted to test here 
+ I am interpreting that we are testing the boundries between gp and all other types of household extention
+ comparing Hispanic and Asian children agaist White children
+ */
+*1) Testing White children vs Hispanic Children
+contrast {dhhtype 0 1 -1 0 0 0}#{rei 1 0 -1 0 0}, effects 
+contrast {dhhtype 0 1 0 -1 0 0}#{rei 1 0 -1 0 0}, effects 
+contrast {dhhtype 0 1 0 0 -1 0}#{rei 1 0 -1 0 0}, effects 
+contrast {dhhtype 0 1 0 0 0 -1}#{rei 1 0 -1 0 0}, effects 
+
+*2) Testing White children vs Asian Children
+contrast {dhhtype 0 1 -1 0 0 0}#{rei 1 0 0 -1 0}, effects 
+contrast {dhhtype 0 1 0 -1 0 0}#{rei 1 0 0 -1 0}, effects 
+contrast {dhhtype 0 1 0 0 -1 0}#{rei 1 0 0 -1 0}, effects 
+contrast {dhhtype 0 1 0 0 0 -1}#{rei 1 0 0 -1 0}, effects 
+
+
 /* overall does not provide support that gp arrangenets vs other types ard particularly different
-among Hispanic and Asians - yet some support that gp vs complex is different than means for Hispanics
-Asians and also Black children
+for Hispanic and Asians when constrasting agaist White children
 */
 
 * Test 4: any extension less associated with instability for Black children than for White children, particularly other kin
-contrast {rei 1 -1 -0 0 0}@i1.hhtype, effects
-contrast {rei 1 -1 -0 0 0}@i2.hhtype, effects
-contrast {rei 1 -1 -0 0 0}@i3.hhtype, effects
-contrast {rei 1 -1 -0 0 0}@i4.hhtype, effects
+contrast {rei 1 -1 0 0 0}@i1.dhhtype, effects
+contrast {rei 1 -1 0 0 0}@i2.dhhtype, effects
+contrast {rei 1 -1 0 0 0}@i3.dhhtype, effects
+contrast {rei 1 -1 0 0 0}@i4.dhhtype, effects
+contrast {rei 1 -1 0 0 0}@i5.dhhtype, effects
 /* partial support, differences not significant for gp arrangements  
 */
 
 
 * Graph
-margins hhtype##rei 
+margins dhhtype##rei 
 marginsplot, ylabel(0(.1).8) ysc(r(0 .8)) scheme(s1color) aspectratio(.5)
 
 log close
