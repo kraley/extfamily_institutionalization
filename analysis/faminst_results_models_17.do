@@ -30,6 +30,7 @@ local bygroups "Total `reidummies'"
 local subheadings "weighted_proportion N"
 
 local hhtype "hhtype_1 hhtype_2 hhtype_3 hhtype_4"
+local dhhtype "dhhtype_1 dhhtype_2 dhhtype_3 dhhtype_4 dhhtype_5"
 local paredummies "plths phs pscol pcolg pedmiss" 
 local parcomp "twobio singlebio stepparent noparent"
 local hhchange "comp_changey hhsplity"
@@ -52,7 +53,7 @@ collect style cell result[_r_b _r_se _r_p], nformat(%3.2f)
 
 forvalues r=1/5{
 	local re : word `r' of `redummies'
-	collect: svy, subpop(if re==`r'):logit hhsplity `baseline' b0.hhtype 
+	collect: svy, subpop(if re==`r'):logit hhsplity `baseline' b2.dhhtype 
 }
 
 collect label levels cmdset 1 "Total" 2 "White" 3 "Black" 4 "Hispanic" 5 "Asian" 6 "Other"
@@ -66,7 +67,7 @@ putexcel A1 = collect
 
 forvalues r=1/5{
 	local re : word `r' of `redummies'
-	margins hhtype, subpop(if re==`r') saving(file`r', replace)
+	margins dhhtype, subpop(if re==`r') saving(file`r', replace)
 }
 
 /*
