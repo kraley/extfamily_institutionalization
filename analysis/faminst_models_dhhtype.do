@@ -20,8 +20,8 @@ svyset [pweight=WPFINWGT]
 drop if missing(comp_changey)
 
 local redummies "nhwhite black hispanic asian otherr"
-local reidummies "nhwhite black hispanic_nat hispanic_im asian_nat asian_im otherr"
-local bygroups "Total `reidummies'"
+*local reidummies "nhwhite black hispanic_nat hispanic_im asian_nat asian_im otherr"
+local bygroups "Total `redummies'"
 local subheadings "weighted_proportion N"
 
 local hhtype "hhtype_1 hhtype_2 hhtype_3 hhtype_4"
@@ -39,24 +39,18 @@ gen adjage_sq = adj_age*adj_age
 local baseline "i.year adj_age adjage_sq i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage log_hhinc" 
 
 svy: logit hhsplity i.re `baseline' 
-outreg2 using "$results/InstExtReg${panel}_dhhtype.xls", append ctitle(Model 2) 
+outreg2 using "$results/InstExtReg${panel}_dhhtype.xlsx", append ctitle(Model 2) 
 
 // in contrast to the descriptive bivariate analysis above, these models 
 *  have mutually-exclusive household type cateogires
 
 svy: logit hhsplity i.re `baseline' b0.dhhtype
-outreg2 using "$results/InstExtReg${panel}_dhhtype.xls", append ctitle(Model 3)
-
-* the code was breaking in the next lines - to prevent this I am recoding the variable rei
-* and listing rei from 1/5
-*replace rei= 4 if rei==5
-*replace rei= 5 if rei==7
-*lab def rei 1 "nhwhite" 2 "black" 3 "hispanic_nat" 4 "asian_nat" 5 "otherr", replace 
+outreg2 using "$results/InstExtReg${panel}_dhhtype.xlsx", append ctitle(Model 3)
 
 forvalues r=1/5{
 	local re : word `r' of `redummies'
 	svy, subpop(if re==`r'):logit hhsplity `baseline' b0.dhhtype 
-	outreg2 using "$results/InstExtReg${panel}_dhhtype.xls", append ctitle(re=`re')
+	outreg2 using "$results/InstExtReg${panel}_dhhtype.xlsx", append ctitle(re=`re')
 	margins dhhtype, subpop(if re==`r') saving(file`r', replace)
 	marginsplot, recast(bar) plotopts(barw(.8)) xtitle(HH Type - `r') legend( order(0 "Nuclear" 1 "Granparents" 2 "Aunt/Uncle" 3 "OtherRelatives" 4 "Non-relatives" 5 "Relatives & non-Relatives"))
 }
@@ -66,10 +60,10 @@ forvalues r=1/5{
 
 local baselineII "i.year adj_age adjage_sq i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage log_hhinc log_wealth"
 forvalues r=1/5{
-	local re : word `r' of `reidummies'
-	svy, subpop(if rei==`r'):logit hhsplity `baselineII' b0.hhtype 
-	outreg2 using "$results/InstExtReg${panel}.xls", append ctitle(re=`re')
-	margins hhtype, subpop(if rei==`r') saving(file`r', replace)
+	local re : word `r' of `redummies'
+	svy, subpop(if re==`r'):logit hhsplity `baselineII' b0.hhtype 
+	outreg2 using "$results/InstExtReg${panel}.xlsx", append ctitle(re=`re')
+	margins hhtype, subpop(if re==`r') saving(file`r', replace)
 	marginsplot, recast(bar) plotopts(barw(.8)) xtitle(HH Typ - `r') legend( order(0 "Nuclear" 1 "Granparents" 2 "Relatives" 3 "Non-relatives" 4 "Relatives & non-Relatives"))
 }
 */							
@@ -79,13 +73,13 @@ log using "${sipp20${panel}_logs}/tests", text replace
 // Tests - Models with interactions
 
 local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage hhmaxage"
-svy: logit hhsplity `baseline' b0.dhhtype##rei
-outreg2 using "$results/Interaction${panel}.xls", append ctitle(Model with interactions)
+svy: logit hhsplity `baseline' b0.dhhtype##re
+outreg2 using "$results/Interaction${panel}.xlsx", append ctitle(Model with interactions)
 
 
 * Test 1 
 // https://stats.idre.ucla.edu/stata/faq/everything-you-always-wanted-to-know-about-contrasts-but-were-afraid-to-ask/
-contrast dhhtype##rei, effects
+contrast dhhtype##re, effects
 /* Support that some extended arrangemenst (grandparents, aunt/uncle, other relative, non-relative
 are associated with less instability for Black ans Hispanic hildren when compared o NH White. Asians are not different.
 */
@@ -104,16 +98,16 @@ contrast {dhhtype 0 1 0 0 0 -1}, effects // gp vs relative & non-relatives
  comparing Hispanic and Asian children agaist White children
  */
 *1) Testing White children vs Hispanic Children
-contrast {dhhtype 0 1 -1 0 0 0}#{rei 1 0 -1 0 0}, effects 
-contrast {dhhtype 0 1 0 -1 0 0}#{rei 1 0 -1 0 0}, effects 
-contrast {dhhtype 0 1 0 0 -1 0}#{rei 1 0 -1 0 0}, effects 
-contrast {dhhtype 0 1 0 0 0 -1}#{rei 1 0 -1 0 0}, effects 
+contrast {dhhtype 0 1 -1 0 0 0}#{re 1 0 -1 0 0}, effects 
+contrast {dhhtype 0 1 0 -1 0 0}#{re 1 0 -1 0 0}, effects 
+contrast {dhhtype 0 1 0 0 -1 0}#{re 1 0 -1 0 0}, effects 
+contrast {dhhtype 0 1 0 0 0 -1}#{re 1 0 -1 0 0}, effects 
 
 *2) Testing White children vs Asian Children
-contrast {dhhtype 0 1 -1 0 0 0}#{rei 1 0 0 -1 0}, effects 
-contrast {dhhtype 0 1 0 -1 0 0}#{rei 1 0 0 -1 0}, effects 
-contrast {dhhtype 0 1 0 0 -1 0}#{rei 1 0 0 -1 0}, effects 
-contrast {dhhtype 0 1 0 0 0 -1}#{rei 1 0 0 -1 0}, effects 
+contrast {dhhtype 0 1 -1 0 0 0}#{re 1 0 0 -1 0}, effects 
+contrast {dhhtype 0 1 0 -1 0 0}#{re 1 0 0 -1 0}, effects 
+contrast {dhhtype 0 1 0 0 -1 0}#{re 1 0 0 -1 0}, effects 
+contrast {dhhtype 0 1 0 0 0 -1}#{re 1 0 0 -1 0}, effects 
 
 
 /* overall does not provide support that gp arrangenets vs other types ard particularly different
@@ -121,17 +115,17 @@ for Hispanic and Asians when constrasting agaist White children
 */
 
 * Test 4: any extension less associated with instability for Black children than for White children, particularly other kin
-contrast {rei 1 -1 0 0 0}@i1.dhhtype, effects
-contrast {rei 1 -1 0 0 0}@i2.dhhtype, effects
-contrast {rei 1 -1 0 0 0}@i3.dhhtype, effects
-contrast {rei 1 -1 0 0 0}@i4.dhhtype, effects
-contrast {rei 1 -1 0 0 0}@i5.dhhtype, effects
+contrast {re 1 -1 0 0 0}@i1.dhhtype, effects
+contrast {re 1 -1 0 0 0}@i2.dhhtype, effects
+contrast {re 1 -1 0 0 0}@i3.dhhtype, effects
+contrast {re 1 -1 0 0 0}@i4.dhhtype, effects
+contrast {re 1 -1 0 0 0}@i5.dhhtype, effects
 /* partial support, differences not significant for gp arrangements  
 */
 
 
 * Graph
-margins dhhtype##rei 
+margins dhhtype##re 
 marginsplot, ylabel(0(.1).8) ysc(r(0 .8)) scheme(s1color) aspectratio(.5)
 
 log close
