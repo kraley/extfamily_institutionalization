@@ -92,9 +92,17 @@ contrast {hhtype 0 1 0 0 -1}, effects // gp vs relative & non-relatives
 */
 
 * Test 3: boundary between grandparents and non-kin is especially strong among Asian and Hispanic children’s 
-contrast {hhtype 0 1 -1 0 0}#g.re, effects
-contrast {hhtype 0 1 0 -1 0}#g.re, effects
-contrast {hhtype 0 1 0 0 -1}#g.re, effects
+
+*1) Testing White children vs Hispanic Children
+contrast {hhtype 0 1 -1 0 0}#{re 1 0 -1 0 0}, effects
+contrast {hhtype 0 1 0 -1 0}#{re 1 0 -1 0 0}, effects
+contrast {hhtype 0 1 0 0 -1}#{re 1 0 -1 0 0}, effects
+
+*2) Testing White children vs Asian Children
+contrast {hhtype 0 1 -1 0 0}#{re 1 0 0 -1 0}, effects
+contrast {hhtype 0 1 0 -1 0}#{re 1 0 0 -1 0}, effects
+contrast {hhtype 0 1 0 0 -1}#{re 1 0 0 -1 0}, effects
+
 /* overall does not provide support that gp arrangenets vs other types ard particularly different
 among Hispanic and Asians - yet some support that gp vs complex is different than means for Hispanics
 Asians and also Black children
