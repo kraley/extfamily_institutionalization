@@ -68,7 +68,7 @@ forvalues r=1/5{
 }
 */							
 
-log using "${sipp20${panel}_logs}/tests", text replace
+log using "${sipp20${panel}_logs}/tests_detailed", text replace
 
 // Tests - Models with interactions
 
@@ -93,10 +93,6 @@ contrast {dhhtype 0 1 0 0 0 -1}, effects // gp vs relative & non-relatives
 */
 
 * Test 3: boundary between grandparents and other kin is especially strong among Asian and Hispanic children’s 
-/* OBS: I am having a little bit of troube understanding what we wanted to test here 
- I am interpreting that we are testing the boundries between gp and all other types of household extention
- comparing Hispanic and Asian children agaist White children
- */
 *1) Testing White children vs Hispanic Children
 contrast {dhhtype 0 1 -1 0 0 0}#{re 1 0 -1 0 0}, effects 
 contrast {dhhtype 0 1 0 -1 0 0}#{re 1 0 -1 0 0}, effects 

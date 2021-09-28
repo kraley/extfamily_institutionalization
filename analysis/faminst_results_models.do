@@ -71,7 +71,7 @@ forvalues r=1/5{
 */
 log using "${sipp20${panel}_logs}/tests", text replace
 
-// Tests - Models with interactions
+// Tests - Models with interactions (without aunt/uncle distinction) 
 
 local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage hhmaxage"
 svy: logit hhsplity `baseline' b0.hhtype##re
