@@ -4,7 +4,7 @@
 
 capture log close
 
-log using "$sipp20pool_logs/faminst_results_describe{panel}.txt", replace
+log using "${sipp20${panel}_logs}/faminst_results_describe${panel}.txt", replace
 
 use "${SIPP${panel}keep}/faminst_analysis.dta", clear
 
@@ -35,7 +35,6 @@ svyset [pweight=WPFINWGT]
 drop if missing(comp_changey)
 
 local redummies "nhwhite black hispanic asian otherr"
-local reidummies "nhwhite black hispanic_nat hispanic_im asian_nat asian_im otherr"
 local bygroups "Total `redummies'"
 local subheadings "weighted_proportion N"
 
@@ -108,28 +107,24 @@ putexcel A10="Race/Ethnicity"
 putexcel A11=" Non-Hispanice White"
 putexcel A12=" Black"
 putexcel A13=" Non-Black Hispanic US-Born"
-*putexcel A14 = " Non--Black Hispanic Immigrant"
-putexcel A15=" Asian, US Born"
-*putexcel A16=" Asian, Immigrant"
-putexcel A17=" Other, including multi-racial"
-*putexcel A18="Parent Immigrant"
-putexcel A19=" Yes"
-putexcel A20="Parental Education"
-putexcel A21=" less than High School"
-putexcel A22=" diploma or GED"
-putexcel A23=" some college"
-putexcel A24=" College Grad"
-putexcel A25=" unknown"
-putexcel A26="Parent"
-putexcel A27=" 2 bio"
-putexcel A28=" 1 bio, nostep"
-putexcel A29=" stepparent"
-putexcel A30=" no parent"
-putexcel A31 = "mean income (1,000s)"
-putexcel A32 = "mean wealth (1,000s)"
-putexcel A33="Household Change"
-putexcel A34="Household Split"
-putexcel A36 = "Total"
+putexcel A14=" Asian, US Born"
+putexcel A15=" Other, including multi-racial"
+putexcel A17="Parental Education"
+putexcel A18=" less than High School"
+putexcel A19=" diploma or GED"
+putexcel A20=" some college"
+putexcel A21=" College Grad"
+putexcel A22=" unknown"
+putexcel A23="Parent"
+putexcel A24=" 2 bio"
+putexcel A25=" 1 bio, nostep"
+putexcel A26=" stepparent"
+putexcel A27=" no parent"
+putexcel A28 = "mean income (1,000s)"
+putexcel A29 = "mean wealth (1,000s)"
+putexcel A30="Household Change"
+putexcel A31="Household Split"
+putexcel A33 = "Total"
 
 ********************************************************************************
 * TABLE Filling
@@ -163,19 +158,9 @@ forvalues r=1/5{
 	putexcel `samp_col'`row' = `r(N)'
 }
 
-/* parent immigrant
-
-local row = `row'+2
-svy: mean pimmigrant
-matrix mpi=e(b)
-putexcel `prop_col'`row' = matrix(mpi), nformat(#.##)
-count if pimmigrant == 1
-putexcel `samp_col'`row' = `r(N)'
-*/
-
 * parent education
 forvalues pe=1/5{
-	local row=`pe'+20
+	local row=`pe'+17
 	local var:word `pe' of `paredummies'
 	svy: mean `var' 
 	matrix mpe`pe' = e(b)
@@ -186,7 +171,7 @@ forvalues pe=1/5{
 
 *parent composition	
 forvalues p=1/4{
-	local row=`p'+26
+	local row=`p'+23
 	local var:word `p' of `parcomp'
 	svy: mean `var' 
 	matrix mp`p' = e(b)
@@ -197,7 +182,7 @@ forvalues p=1/4{
 
 *HOUSEHOLD INCOME and Assets (means)
 forvalues ia=1/2{
-	local row=`ia'+30
+	local row=`ia'+27
 	local var:word `ia' of `incomeassets'
 	svy: mean `var' 
 	matrix mh`ia' = e(b)/1000
@@ -208,7 +193,7 @@ forvalues ia=1/2{
 
 *comp change
 forvalues h=1/2{
-	local row=`h'+32
+	local row=`h'+29
 	local var:word `h' of `hhchange'
 	svy: mean `var' 
 	matrix mh`h' = e(b)
@@ -218,7 +203,7 @@ forvalues h=1/2{
 }
 
 * total sample size
-local row = 36
+local row = 33
 count if  !missing(comp_changey)
 putexcel `samp_col'`row' = `r(N)'
 
@@ -250,7 +235,7 @@ forvalues re=1/5{
 	display "parent education"
 	* parent education
 	forvalues pe=1/5{
-		local row=`pe'+20
+		local row=`pe'+17
 		local var:word `pe' of `paredummies'
 		svy, subpop(if re==`re'): mean `var' 
 		matrix mpe`pe'`re' = e(b)
@@ -261,7 +246,7 @@ forvalues re=1/5{
 	display "parent composition"
 	*parent composition	
 	forvalues p=1/4{
-		local row=`p'+26
+		local row=`p'+23
 		local var:word `p' of `parcomp'
 		svy, subpop(if re==`re'): mean `var' 
 		matrix mp`p'`re' = e(b)
@@ -271,18 +256,18 @@ forvalues re=1/5{
 	}
 	*HOUSEHOLD INCOME and Assets (means)
 	forvalues ia=1/2{
-		local row=`ia'+30
+		local row=`ia'+27
 		local var:word `ia' of `incomeassets'
 		svy, subpop(if re==`re'): mean `var'
 		matrix mh`ia'`re' = e(b)/1000
 		display "the mean `var' is `e(b)'"
 		putexcel `propcol'`row' = matrix(mh`ia'`re'), nformat(#)
-		count if  rei == `re'
+		count if  re == `re'
 		putexcel `ncol'`row' = `r(N)'
 	}
 	*household change
 	forvalues h=1/2{
-		local row=`h'+32
+		local row=`h'+29
 		local var:word `h' of `hhchange'
 		svy, subpop(if re==`re'): mean `var'  
 		matrix mh`h'`re' = e(b)
@@ -291,8 +276,8 @@ forvalues re=1/5{
 		putexcel `ncol'`row' = `r(N)'
 	}
 	* total sample size
-	local row = 36
-	count if  rei == `re'
+	local row = 33
+	count if  re == `re'
 	putexcel `ncol'`row' = `r(N)'
 }
 
@@ -311,11 +296,17 @@ labels(White Other) xscale(r(0 1)) xtitle(“Race”)
 
 */
 
-local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage hhmaxage"
+local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage hhmaxage hhinc"
 
+**# Bookmark #1
 mlogit hhtype i.re
 
 mlogit hhtype i.re `baseline' 
+
+
+keep if panel==2
+
+mlogit hhtype i.re `baseline' THNETWORTH
 
 
 log close

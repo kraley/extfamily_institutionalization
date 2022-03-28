@@ -8,31 +8,7 @@ log using "$sipp20pool_logs/faminst_results_describe{panel}.txt", replace
 
 use "${SIPP${panel}keep}/faminst_analysis.dta", clear
 
-* Note that top_age is set in project macros. If you want to change
-* the age range, change it there, rather than here. Otherwise 
-* the parts of the code designed to describe sample selection
-* won't work properly
-
-keep if adj_age < $top_age
-
-* Select only one child per household
-tempfile holding
-save `holding'
-
-keep SSUID PNUM
-duplicates drop
-
-set seed 2222
-bys SSUID: sample 1, count 
-
-merge 1:m SSUID PNUM using `holding', assert(match using) keep(match) nogenerate 
-
-
-keep if pimmigrant == 0
-
 svyset [pweight=WPFINWGT]
-
-drop if missing(comp_changey)
 
 local redummies "nhwhite black hispanic asian otherr"
 local reidummies "nhwhite black hispanic_nat hispanic_im asian_nat asian_im otherr"
@@ -302,11 +278,15 @@ labels(White Other) xscale(r(0 1)) xtitle(“Race”)
 
 */
 
-local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage hhmaxage"
+local baseline "i.par_ed_first i.parentcomp hhinc i.year adj_age"
 
-mlogit dhhtype i.re
+svy: mlogit dhhtype i.re
+outreg2 using "$results/T2_HHtype_${panel}.xls", ctitle(Race/Ethnicity)
 
-mlogit dhhtype i.re `baseline' 
+svy: mlogit dhhtype i.re `baseline' 
+outreg2 using "$results/T2_HHtype_${panel}.xls", ctitle(Full)
 
+svy: mlogit dhhtype i.re `baseline' THNETWORTH
+outreg2 using "$results/T2_HHtype_${panel}.xls", ctitle(Full+)
 
 log close

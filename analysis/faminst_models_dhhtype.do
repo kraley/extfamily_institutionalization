@@ -39,7 +39,7 @@ gen adjage_sq = adj_age*adj_age
 local baseline "i.year adj_age adjage_sq i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage log_hhinc" 
 
 svy: logit hhsplity i.re `baseline' 
-outreg2 using "$results/InstExtReg${panel}_dhhtype.xlsx", append ctitle(Model 2) 
+outreg2 using "$results/InstExtReg${panel}_dhhtype.xls", append ctitle(Model 2) 
 
 // in contrast to the descriptive bivariate analysis above, these models 
 *  have mutually-exclusive household type cateogires
@@ -50,8 +50,8 @@ outreg2 using "$results/InstExtReg${panel}_dhhtype.xlsx", append ctitle(Model 3)
 forvalues r=1/5{
 	local re : word `r' of `redummies'
 	svy, subpop(if re==`r'):logit hhsplity `baseline' b0.dhhtype 
-	outreg2 using "$results/InstExtReg${panel}_dhhtype.xlsx", append ctitle(re=`re')
-	margins dhhtype, subpop(if re==`r') saving(file`r', replace)
+	outreg2 using "$results/InstExtReg${panel}_dhhtype.xls", append ctitle(re=`re')
+	margins dhhtype, subpop(if re==`r') saving("$results/fig2`r'", replace)
 	marginsplot, recast(bar) plotopts(barw(.8)) xtitle(HH Type - `r') legend( order(0 "Nuclear" 1 "Granparents" 2 "Aunt/Uncle" 3 "OtherRelatives" 4 "Non-relatives" 5 "Relatives & non-Relatives"))
 }
 
@@ -62,7 +62,7 @@ local baselineII "i.year adj_age adjage_sq i.par_ed_first i.parentcomp mom_age m
 forvalues r=1/5{
 	local re : word `r' of `redummies'
 	svy, subpop(if re==`r'):logit hhsplity `baselineII' b0.hhtype 
-	outreg2 using "$results/InstExtReg${panel}.xlsx", append ctitle(re=`re')
+	outreg2 using "$results/InstExtReg${panel}.xls", append ctitle(re=`re')
 	margins hhtype, subpop(if re==`r') saving(file`r', replace)
 	marginsplot, recast(bar) plotopts(barw(.8)) xtitle(HH Typ - `r') legend( order(0 "Nuclear" 1 "Granparents" 2 "Relatives" 3 "Non-relatives" 4 "Relatives & non-Relatives"))
 }
@@ -74,7 +74,7 @@ log using "${sipp20${panel}_logs}/tests_detailed", text replace
 
 local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage hhmaxage"
 svy: logit hhsplity `baseline' b0.dhhtype##re
-outreg2 using "$results/Interaction${panel}.xlsx", append ctitle(Model with interactions)
+outreg2 using "$results/Interaction${panel}.xls", append ctitle(Model with interactions)
 
 
 * Test 1 

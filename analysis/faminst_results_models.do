@@ -1,6 +1,6 @@
 
 use "${SIPP${panel}keep}/faminst_analysis.dta", clear
-
+global panel "pool"
 keep if adj_age < $top_age
 
 * Select only one child per household
@@ -39,21 +39,24 @@ local baseline "i.year adj_age adjage_sq i.par_ed_first i.parentcomp mom_age mom
 
 macro list
 
-svy: logit hhsplity i.re `baseline' 
-outreg2 using "$results/InstExtReg${panel}.xlsx", append ctitle(Model 2) 
-
-// in contrast to the descriptive bivariate analysis above, these models 
-*  have mutually-exclusive household type cateogires
-
-svy: logit hhsplity i.re `baseline' b0.hhtype
-outreg2 using "$results/InstExtReg${panel}.xlsx", append ctitle(Model 3)
+svy: logit hhsplity i.re `baseline' i.hhtype
+outreg2 using "$results/InstExtReg${panel}.xls", append ctitle(Total) 
 
 forvalues r=1/5{
 	local re : word `r' of `redummies'
-	svy, subpop(if re==`r'):logit hhsplity `baseline' b0.hhtype 
-	outreg2 using "$results/InstExtReg${panel}.xlsx", append ctitle(re=`re')
-	margins hhtype, subpop(if re==`r') saving(file`r', replace)
+	svy, subpop(if re==`r'):logit hhsplity `baseline' i.hhtype 
+	outreg2 using "$results/InstExtReg${panel}.xls", append ctitle(re=`re')
+	margins hhtype, subpop(if re==`r') saving("$results/fig1`r'", replace)
 	marginsplot, recast(bar) plotopts(barw(.8)) xtitle(HH Type - `r') legend( order(0 "Nuclear" 1 "Granparents" 2 "Relatives" 3 "Non-relatives" 4 "Relatives & non-Relatives"))
+}
+
+svy: logit hhsplity i.re `baseline' b1.hhtype
+outreg2 using "$results/InstExtReg${panel}_gp.xls", append ctitle(Total)
+
+forvalues r=1/5{
+	local re : word `r' of `redummies'
+	svy, subpop(if re==`r'):logit hhsplity `baseline' b1.hhtype 
+	outreg2 using "$results/InstExtReg${panel}_gp.xls", append ctitle(re=`re')
 }
 
 /* 
@@ -63,7 +66,7 @@ local baselineII "i.year adj_age adjage_sq i.par_ed_first i.parentcomp mom_age m
 forvalues r=1/5{
 	local re : word `r' of `redummies'
 	svy, subpop(if re==`r'):logit hhsplity `baselineII' b0.hhtype 
-	outreg2 using "$results/InstExtReg${panel}.xlsx", append ctitle(re=`re')
+	outreg2 using "$results/InstExtReg${panel}.xls", append ctitle(re=`re')
 	margins hhtype, subpop(if re==`r') saving(file`r', replace)
 	marginsplot, recast(bar) plotopts(barw(.8)) xtitle(HH Typ - `r') legend( order(0 "Nuclear" 1 "Granparents" 2 "Relatives" 3 "Non-relatives" 4 "Relatives & non-Relatives"))
 }
@@ -75,7 +78,7 @@ log using "${sipp20${panel}_logs}/tests", text replace
 
 local baseline "i.year adj_age i.par_ed_first i.parentcomp mom_age mom_age2 hhsize b2.chhmaxage hhmaxage"
 svy: logit hhsplity `baseline' b0.hhtype##re
-outreg2 using "$results/Interaction${panel}.xlsx", append ctitle(Model with interactions)
+outreg2 using "$results/Interaction${panel}.xls", append ctitle(Model with interactions)
 
 
 * Test 1 

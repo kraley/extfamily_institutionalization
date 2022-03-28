@@ -25,26 +25,22 @@ forvalues p=1/2 {
 
 	* Prepare other variables for analysis
 	do faminst_prepdata.do
-	* create table of descriptive results
-*	do faminst_results_describe.do
-
-	* create table of model results
-*	do faminst_results_models.do
 }
 
 * This section pools the data files for the two panels and analyzes them together
 
-use "$SIPP08keep/faminst_analysis.dta", clear
+use "$SIPP08keep/faminst_beforeattrition.dta", clear
 
 gen panel=1
 
-append using "$SIPP14keep/faminst_analysis.dta"
+append using "$SIPP14keep/faminst_beforeattrition.dta"
 
 replace panel=2 if missing(panel)
 
 replace year=year+4 if panel==2
 
-save "$SIPPpoolkeep/faminst_analysis.dta", replace
+save "$SIPPpoolkeep/faminst_beforeattrition.dta", replace
+
 
 global panel "pool"
 

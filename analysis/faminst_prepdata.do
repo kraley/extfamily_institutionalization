@@ -1,4 +1,4 @@
-* famiinst_prepdata.do
+* faminst_prepdata.do
 *
 *  Merge together files desccribing household composition in December of each year
 *  to predict a composition change over the subsequent year.
@@ -180,11 +180,12 @@ gen hispanic= my_racealt==3
 gen asian= my_racealt==4
 gen otherr=my_racealt==5
 
+replace par_ed_first=5 if missing(par_ed_first)
 gen plths=par_ed_first==1
 gen phs=par_ed_first==2
 gen pscol=par_ed_first==3
 gen pcolg=par_ed_first==4
-gen pedmiss= missing(par_ed_first)
+gen pedmiss= par_ed_first==5
 
 label define educ 1 "Less than High School" 2 "High School Diploma" 3 "Some College" 4 "College Grad+" 5 "Missing"
 label values par_ed_first educ
@@ -275,9 +276,5 @@ forvalues t=1/5{
 	gen dhhtype_`t' = (dhhtype==`t')
 }
 
-keep if pimmigrant==0
-
-tab re
-
-save "${SIPP${panel}keep}/faminst_analysis.dta", replace
+save "${SIPP${panel}keep}/faminst_beforeattrition.dta", replace
 

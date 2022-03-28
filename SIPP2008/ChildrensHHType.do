@@ -129,8 +129,9 @@ merge 1:1 SSUID EPPPNUM panelmonth using "$SIPP08keep/demo_long_interviews_am.dt
 keepusing(WPFINWGT my_racealt adj_age my_sex biomom_ed_first par_ed_first ///
 ref_person_educ mom_measure mom_age mom_tmoveus dad_tmoveus THTOTINC)
 
-*to make code work for moth 2008 panel and 2014 panel
-gen THNETWORTH=.
+drop _merge
+
+
 
 * Most, but not all, of the difference in samples (_merge !=3) is because of the earlier selection
 * of individual-months less than 18 years old.
@@ -138,57 +139,9 @@ gen THNETWORTH=.
 * Note also that demo_long_interviews_am includes individuals living alone
 * whereas the files describing household composition do not. 
 
-***************************************************************************
-* Checking sample size before any restrictions. demo_long_interview_am.dta is
-* complete. I have confirmed against the log for merge_all_months
+*to make code work for moth 2008 panel and 2014 panel
+gen THNETWORTH=.
 
-* First, create an id variable per person
-	sort SSUID EPPPNUM
-	egen id = concat (SSUID EPPPNUM)
-	destring id, gen(idnum)
-	format idnum %20.0f
-	drop id
-
-// Create a macro with the total number of respondents in the dataset.
-	egen allobs = nvals(idnum)
-	global allindividuals`panel' = allobs
-	di "${allindividuals`panel'}"
-	drop allobs
-	
-	global allmonths`panel' = _N
-	di "${allmonths`panel'}"
-
-*******************************************************************************
-* First major sample selection: children only. We can finally do this now 
-* that we have variables describing household composition and household change
-*******************************************************************************
-keep if adj_age < $top_age
-
-// Create a macro with the total number of respondents in the dataset.
-
-    egen allobs = nvals(idnum)
-	global allchildren`panel' = allobs
-	di "${allchildren`panel'}"
-	drop allobs
-		
-	global allchildmonths`panel' = _N
-	di "${allchildmonths`panel'}"
-
-* drop cases living alone. the assert will break if top_age > 15
-assert _merge==3
-
-drop _merge
-
-/* add this back in if top_age > 15
-    egen coreskid = nvals(idnum)
-	global coreschild`panel' = coreskid
-	di "${coreschild`panel'}"
-	drop coreskid
-		
-	global coreschildmonths`panel' = _N
-	di "${coreschildmonths`panel'}"
-*/
-	
 gen weight=int(WPFINWGT*10000)
 
 * Transitively-derived (augmented by T2)
