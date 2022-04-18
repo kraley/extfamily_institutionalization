@@ -87,6 +87,8 @@ preserve
 
 	drop if missing(hhinc)
 	
+	tab mom_age_first, m
+	
     egen analysiskid = nvals(idnum)
 	global analysiskid`panel' = analysiskid 
 

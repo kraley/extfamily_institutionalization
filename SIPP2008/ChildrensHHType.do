@@ -126,20 +126,24 @@ if hhmaxage < 14 then chhmaxage==2
 
 * merge basic demographic information onto the file.
 merge 1:1 SSUID EPPPNUM panelmonth using "$SIPP08keep/demo_long_interviews_am.dta", ///
-keepusing(WPFINWGT my_racealt adj_age my_sex biomom_ed_first par_ed_first ///
-ref_person_educ mom_measure mom_age mom_tmoveus dad_tmoveus THTOTINC)
+keepusing(WPFINWGT my_racealt my_race adj_age my_sex biomom_ed_first par_ed_first ///
+ref_person_educ mom_measure mom_age mom_age_first mom_tmoveus dad_tmoveus THTOTINC)
+
+keep if _merge==3
 
 drop _merge
 
+tab mom_age, m 
 
+tab mom_age_first, m
 
 * Most, but not all, of the difference in samples (_merge !=3) is because of the earlier selection
-* of individual-months less than 18 years old.
+* of individual-months less than top age.
 
 * Note also that demo_long_interviews_am includes individuals living alone
 * whereas the files describing household composition do not. 
 
-*to make code work for moth 2008 panel and 2014 panel
+*to make code work for both 2008 panel and 2014 panel
 gen THNETWORTH=.
 
 gen weight=int(WPFINWGT*10000)
@@ -185,6 +189,7 @@ label define yesno  0 "no"
 local anyrel "anygp anyauntuncle anyother anynonrel"
 
 label variable my_racealt "Race-Ethnicity"
+label variable my_race "Race-Ethnicity (standard)"
 
 foreach v in `anyrel'{
 	label values `v' yesno
@@ -198,5 +203,8 @@ foreach v in `t2rel'{
 }
 
 gen pimmigrant=((mom_tmoveus>17 & mom_tmoveus!=.) | (dad_tmoveus>17 & dad_tmoveus!=.))
+gen mispimmig= mom_tmoveus==. & dad_tmoveus==.
+
+tab mispimmig
 
 save "$SIPP08keep/relationships.dta", replace

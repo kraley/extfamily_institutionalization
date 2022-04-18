@@ -174,11 +174,11 @@ replace mom_age=0 if missing(mom_age)
 gen mom_age2=mom_age*mom_age
 
 * dummy indicators for demographics
-gen black= my_racealt==2
-gen nhwhite= my_racealt==1
-gen hispanic= my_racealt==3
-gen asian= my_racealt==4
-gen otherr=my_racealt==5
+gen black= my_race==2
+gen nhwhite= my_race==1
+gen hispanic= my_race==3
+gen asian= my_race==4
+gen otherr=my_race==5
 
 replace par_ed_first=5 if missing(par_ed_first)
 gen plths=par_ed_first==1

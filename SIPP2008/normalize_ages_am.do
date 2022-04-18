@@ -166,7 +166,6 @@ drop num_adjbkwd_matches num_adjfwd_matches
 drop anyproblem
 drop any_adj_problem
 
-
 * Create dummies for whether in this interview to be able to create an indicator for whether in interview next month
 forvalues w=1/$finalmonth {
   gen in`w'=0
@@ -178,6 +177,23 @@ forvalues w=1/$penultimate_month {
   gen innext`w'=0
   replace innext`w'=1 if in`x'==1
  }
+
+* create a measure of mother's age that is fixed and not missing for as many cases as possible
+gen mom_age_first=mom_age1
+forvalues month = $second_month/$finalmonth {
+  replace mom_age_first=mom_age`month' if missing(mom_age_first)
+} 
+
+gen dad_age_first=dad_age1
+forvalues month = $second_month/$finalmonth {
+  replace dad_age_first=dad_age`month' if missing(dad_age_first)
+} 
+
+tab mom_age_first if adj_age1 < 16, m 
+
+replace mom_age_first=dad_age_first if missing(mom_age_first)
+
+tab mom_age_first if adj_age1 < 16, m
 
 save "$tempdir/person_wide_adjusted_ages_am", $replace
 

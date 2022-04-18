@@ -119,7 +119,7 @@ do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" create_HHComp_asis
 * Create measures of children's Household Type
 do "$base_code/do_and_log" "$sipp2014_code" "$sipp2014_logs" ChildrensHHType.do
 
-/*
+
 ******************************
 * Clean up temporary directory
 ******************************

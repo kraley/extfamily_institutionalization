@@ -40,7 +40,6 @@ forvalues n=101/120 {
 
 tab with_original
 
-
 replace with_original=1 if with_original > 1
 
 tab with_original
@@ -55,6 +54,10 @@ tab with_original
 recode EPNMOM (9999 = .), gen(pdemo_epppnum)
 merge m:1 SSUID pdemo_epppnum panelmonth using "$tempdir/person_pdemo_am"
 assert missing(pdemo_epppnum) if (_merge == 1)
+
+gen no_mom=1 if _merge==1
+replace no_mom=0 if missing(no_mom)
+
 drop if _merge == 2
 drop _merge
 drop pdemo_epppnum
@@ -64,6 +67,8 @@ rename ptmoveus mom_tmoveus
 rename ptbrstate mom_tbrstate
 gen biomom_age=mom_age if ETYPMOM==1
 gen biomom_educ=mom_educ if ETYPMOM==1
+
+tab mom_age no_mom, m
 
 label var mom_educ "Mother's (bio, step, adopt) educational level (this wave)"
 label var mom_age "Mother's (bio, step, adoptive) Age (uncleaned)"
